@@ -1,0 +1,33 @@
+plugins {
+    id 'java'
+    id 'ear'
+    id 'war'
+}
+
+group = 'com.company.insurance'
+version = '1.0.0'
+
+repositories { mavenCentral() }
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+dependencies {
+    deploy 'javax:javaee-api:8.0'
+    implementation 'javax.jws:javax.jws-api:1.1'
+}
+
+war {
+    from(sourceSets.main.output)
+    webXml = file('src/main/webapp/WEB-INF/web.xml')
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    archiveFileName.set("insurance-policy-app.war")
+}
+
+ear {
+    from(war.archiveFile) { into '' }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    archiveFileName.set("insurance-policy-app.ear")
+}
