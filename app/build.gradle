@@ -4,11 +4,14 @@ plugins {
     id 'ear'
 }
 
-group 'com.company.insurance'
-version '1.0-SNAPSHOT'
+group = 'com.company.insurance'
+version = '1.0-SNAPSHOT'
 
-sourceCompatibility = '11'
-targetCompatibility = '11'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
 
 repositories {
     mavenCentral()
