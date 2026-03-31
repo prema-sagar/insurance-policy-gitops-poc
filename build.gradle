@@ -1,0 +1,26 @@
+plugins {
+    id 'java'
+    id 'war'
+}
+
+group = 'com.example.insurance'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+dependencies {
+    providedCompile 'javax:javaee-api:8.0'
+    implementation 'com.sun.xml.ws:jaxws-rt:2.3.3'
+    testImplementation 'junit:junit:4.13.2'
+}
+
+war {
+    archiveFileName = 'insurance-health-component.war'
+}
