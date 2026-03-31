@@ -48,6 +48,8 @@ jobs:
         run: |
           set -o pipefail
           echo "Trying WSDL paths: $WSDL_PATHS"
+          # Ensure curl is available on the runner (some minimal images may not have it)
+          sudo apt-get update && sudo apt-get install -y curl || true
           ATTEMPTS=0
           SUCCESS=0
           for PATH in $WSDL_PATHS; do
