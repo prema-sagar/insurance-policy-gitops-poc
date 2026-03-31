@@ -39,6 +39,18 @@ jobs:
           push: true
           tags: docker.io/${{ env.IMAGE }}:latest
 
+      - name: Check Docker availability on runner
+        run: |
+          echo "Checking docker client availability..."
+          if ! command -v docker >/dev/null 2>&1; then
+            echo "ERROR: docker CLI not found on this runner."
+            echo "If you're using a self-hosted runner, install Docker Engine or use a GitHub-hosted runner (ubuntu-latest)."
+            exit 1
+          fi
+          docker --version
+          # docker info may require privileges; attempt but don't fail on error
+          docker info || true
+
       - name: Run container for smoke test
         run: |
           docker rm -f $CONTAINER_NAME || true
