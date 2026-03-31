@@ -5,7 +5,10 @@ import com.example.insurance.model.PolicyResponse;
 
 import javax.jws.WebService;
 
-@WebService(endpointInterface = "com.example.insurance.soap.HealthPolicySoapService")
+@WebService(
+    endpointInterface = "com.example.insurance.soap.HealthPolicySoapService",
+    serviceName = "HealthPolicySoapService"
+)
 public class HealthPolicySoapServiceImpl implements HealthPolicySoapService {
 
     private final PolicyServiceBean policyServiceBean = new PolicyServiceBean();
@@ -15,6 +18,7 @@ public class HealthPolicySoapServiceImpl implements HealthPolicySoapService {
         PolicyResponse response = new PolicyResponse();
         response.setPolicyNumber(policyNumber);
         response.setPolicyStatus(policyServiceBean.getPolicyStatus(policyNumber));
+        response.setInsuredName("John Smith");
         return response;
     }
 }

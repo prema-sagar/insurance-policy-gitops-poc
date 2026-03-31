@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'war'
+    id 'io.openliberty.tools.gradle.Liberty' version '3.9.4'
 }
 
 group = 'com.example.insurance'
@@ -10,15 +11,28 @@ repositories {
     mavenCentral()
 }
 
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
 
 dependencies {
-    providedCompile 'javax:javaee-api:8.0'
-    implementation 'com.sun.xml.ws:jaxws-rt:2.3.3'
+    compileOnly 'javax:javaee-api:8.0'
+
+    implementation 'com.sun.xml.ws:jaxws-rt:2.3.7'
+    implementation 'javax.xml.ws:jaxws-api:2.3.1'
+    implementation 'javax.jws:javax.jws-api:1.1'
+
     testImplementation 'junit:junit:4.13.2'
 }
 
 war {
     archiveFileName = 'insurance-health-component.war'
+}
+
+liberty {
+    server {
+        name = 'defaultServer'
+    }
 }

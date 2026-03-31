@@ -1,23 +1,16 @@
-package com.example.insurance.service;
+package com.example.insurance.soap;
+
+import com.example.insurance.model.PolicyResponse;
 
 import javax.jws.WebMethod;
+import javax.jws.WebParam;
 import javax.jws.WebService;
 
-@WebService
-public class HealthPolicySoapService {
+@WebService(serviceName = "HealthPolicySoapService")
+public interface HealthPolicySoapService {
 
     @WebMethod
-    public String getPolicyStatus(String policyId) {
-        return "Policy ID " + policyId + " is ACTIVE";
-    }
-
-    @WebMethod
-    public double calculatePremium(int age, String planType) {
-        if ("GOLD".equalsIgnoreCase(planType)) {
-            return age * 150;
-        } else if ("SILVER".equalsIgnoreCase(planType)) {
-            return age * 100;
-        }
-        return age * 75;
-    }
+    PolicyResponse getPolicyDetails(
+        @WebParam(name = "policyNumber") String policyNumber
+    );
 }

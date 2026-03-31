@@ -1,4 +1,6 @@
-FROM websphere-liberty:latest
+FROM ibmcom/websphere-liberty:latest
 
-COPY --chown=1001:0 build/libs/insurance-health-component.war /config/dropins/
-COPY --chown=1001:0 server.xml /config/
+COPY build/libs/insurance-health-component.war /config/dropins/
+COPY server.xml /config/
+
+EXPOSE 9080 9443
