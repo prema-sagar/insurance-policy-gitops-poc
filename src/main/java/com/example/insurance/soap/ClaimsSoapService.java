@@ -5,7 +5,7 @@ import javax.jws.WebMethod;
 import javax.jws.WebService;
 import java.util.List;
 
-@WebService(serviceName = "ClaimsSoapService")
+@WebService
 public interface ClaimsSoapService {
 
     @WebMethod
