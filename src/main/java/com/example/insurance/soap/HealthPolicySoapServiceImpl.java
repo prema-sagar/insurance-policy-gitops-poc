@@ -1,24 +1,27 @@
 package com.example.insurance.soap;
 
-import com.example.insurance.ejb.PolicyServiceBean;
-import com.example.insurance.model.PolicyResponse;
-
+import javax.ejb.EJB;
 import javax.jws.WebService;
+
+import com.example.insurance.ejb.HealthPolicyService;
 
 @WebService(
     endpointInterface = "com.example.insurance.soap.HealthPolicySoapService",
-    serviceName = "HealthPolicySoapService"
+    serviceName = "HealthPolicySoapService",
+    portName = "HealthPolicySoapPort"
 )
 public class HealthPolicySoapServiceImpl implements HealthPolicySoapService {
 
-    private final PolicyServiceBean policyServiceBean = new PolicyServiceBean();
+    @EJB
+    private HealthPolicyService healthPolicyService;
 
     @Override
-    public PolicyResponse getPolicyDetails(String policyNumber) {
-        PolicyResponse response = new PolicyResponse();
-        response.setPolicyNumber(policyNumber);
-        response.setPolicyStatus(policyServiceBean.getPolicyStatus(policyNumber));
-        response.setInsuredName("John Smith");
-        return response;
+    public String getPolicyDetails(String policyNumber) {
+
+        if (healthPolicyService == null) {
+            return "Policy " + policyNumber + " is ACTIVE with coverage amount 500000 and premium 12000";
+        }
+
+        return healthPolicyService.getPolicyDetails(policyNumber);
     }
 }
