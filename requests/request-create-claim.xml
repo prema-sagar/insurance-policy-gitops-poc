@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- WSDL: http://localhost:9080/insurance-health-component/HealthPolicySoapService?wsdl -->
+<!-- WSDL: http://localhost:9080/insurance-health-component/ClaimsSoapService?wsdl -->
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
                   xmlns:ns="http://soap.insurance.example.com/">
   <soapenv:Header/>
   <soapenv:Body>
-    <ns:getPolicyDetails>
+    <ns:createClaim>
       <policyNumber>POL123</policyNumber>
-    </ns:getPolicyDetails>
+      <amount>2500.0</amount>
+    </ns:createClaim>
   </soapenv:Body>
 </soapenv:Envelope>

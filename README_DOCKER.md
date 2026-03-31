@@ -10,6 +10,14 @@ Prerequisites
 Files added
 - `scripts\rebuild-and-push.ps1` — builds the image and pushes to Docker Hub.
 - `requests\request-soap11.xml` — example SOAP 1.1 request you can POST to the service.
+ - `requests\request-soap11.xml` — example SOAP 1.1 request you can POST to the service.
+
+WSDL endpoints (local):
+
+- HealthPolicy WSDL: http://localhost:9080/insurance-health-component/HealthPolicySoapService?wsdl
+- Claims WSDL: http://localhost:9080/insurance-health-component/ClaimsSoapService?wsdl
+
+All operations belonging to a particular SOAP service share the same POST endpoint. For example, `getPolicyDetails` and `getPolicyStatus` are both invoked at `http://localhost:9080/insurance-health-component/HealthPolicySoapService`.
 
 Usage
 1) Build and push the image (from the project root):
