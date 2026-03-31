@@ -9,4 +9,7 @@ public interface HealthPolicySoapService {
 
     @WebMethod
     PolicyResponse getPolicyDetails(String policyNumber);
+
+    @WebMethod
+    String getPolicyStatus(String policyNumber);
 }

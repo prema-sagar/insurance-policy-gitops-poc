@@ -26,6 +26,9 @@ dependencies {
     compileOnly 'javax.xml.ws:jaxws-api:2.3.1'
     compileOnly 'javax.jws:javax.jws-api:1.1'
 
+    // Demo in-memory database for POC
+    implementation 'com.h2database:h2:2.1.214'
+
     testImplementation 'junit:junit:4.13.2'
 }
 

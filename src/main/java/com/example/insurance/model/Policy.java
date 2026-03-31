@@ -24,4 +24,38 @@ public class Policy {
     public void setPolicyId(String policyId) {
         this.policyId = policyId;
     }
+
+    public String getCustomerName() {
+        return customerName;
+    }
+
+    public void setCustomerName(String customerName) {
+        this.customerName = customerName;
+    }
+
+    public String getPolicyType() {
+        return policyType;
+    }
+
+    public void setPolicyType(String policyType) {
+        this.policyType = policyType;
+    }
+
+    public double getPremiumAmount() {
+        return premiumAmount;
+    }
+
+    public void setPremiumAmount(double premiumAmount) {
+        this.premiumAmount = premiumAmount;
+    }
+
+    @Override
+    public String toString() {
+        return "Policy{" +
+                "policyId='" + policyId + '\'' +
+                ", customerName='" + customerName + '\'' +
+                ", policyType='" + policyType + '\'' +
+                ", premiumAmount=" + premiumAmount +
+                '}';
+    }
 }
