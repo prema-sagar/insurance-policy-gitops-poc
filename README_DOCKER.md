@@ -9,7 +9,7 @@ Prerequisites
 
 Files added
 - `scripts\rebuild-and-push.ps1` — builds the image and pushes to Docker Hub.
-- `scripts\check-wsdl.ps1` — pulls/runs the image and fetches the WSDL to verify the SOAP endpoint.
+- `requests\request-soap11.xml` — example SOAP 1.1 request you can POST to the service.
 
 Usage
 1) Build and push the image (from the project root):
@@ -19,16 +19,22 @@ Usage
 .\scripts\rebuild-and-push.ps1 -ImageName prema064/insurance-health-component -Tag latest
 ```
 
-2) Pull, run and check the WSDL:
+2) Pull and run the container locally, then POST the SOAP request saved in `requests\request-soap11.xml`:
 
 ```powershell
-# pull, run container, and fetch WSDL
-.\scripts\check-wsdl.ps1 -Image 'prema064/insurance-health-component:latest' -HostPort 9080 -Context '/insurance' -Service 'HealthPolicySoapService'
+# pull and run container
+docker pull prema064/insurance-health-component:latest
+docker rm -f insurance 2>$null
+docker run -d --name insurance -p 9080:9080 prema064/insurance-health-component:latest
+Start-Sleep -Seconds 8
+
+# POST the provided SOAP request (PowerShell)
+Invoke-RestMethod -Uri 'http://localhost:9080/insurance-health-component/HealthPolicySoapService' -Method Post -ContentType 'text/xml; charset=utf-8' -Body (Get-Content .\requests\request-soap11.xml -Raw)
 ```
 
 What the scripts do
 - `rebuild-and-push.ps1` runs `docker build` and `docker push`.
-- `check-wsdl.ps1` pulls the image, removes any previous container with the same name, starts a new container mapping the host port to container port 9080, waits for the server to start, then attempts to fetch the WSDL URL and writes the WSDL to `wsdl.xml` in the current directory.
+Note: the repository previously contained a helper script to fetch the WSDL automatically; that script was removed to keep the repo minimal. Use the commands above to run the container and POST the SOAP request.
 
 Troubleshooting
 - If the WSDL isn't available, inspect container logs:
