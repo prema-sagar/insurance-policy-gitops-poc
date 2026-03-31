@@ -48,22 +48,22 @@ jobs:
         run: |
           set -o pipefail
           echo "Trying WSDL paths: $WSDL_PATHS"
-          # Ensure curl is available on the runner (some minimal images may not have it)
-          sudo apt-get update && sudo apt-get install -y curl || true
           ATTEMPTS=0
           SUCCESS=0
           for PATH in $WSDL_PATHS; do
             echo "Checking path: $PATH"
             ATTEMPTS=0
             while [ $ATTEMPTS -lt 30 ]; do
-              if curl -sS --max-time 5 "http://localhost:9080${PATH}" -o wsdl.xml; then
+              # Use the curlimages container to perform the HTTP request and write the result into the workspace
+              if docker run --rm --network host -v "${{ github.workspace }}":/workspace curlimages/curl:7.88.1 curl -sS --max-time 5 "http://localhost:9080${PATH}" -o /workspace/wsdl.xml; then
                 echo "Successfully fetched WSDL from $PATH"
                 SUCCESS=1
                 break 2
               fi
               ATTEMPTS=$((ATTEMPTS+1))
               echo "Waiting for server to start... (attempt $ATTEMPTS) for path $PATH"
-              sleep 5
+              # Use a small container for sleeping to avoid relying on host sleep binary
+              docker run --rm busybox sleep 5
             done
             echo "Path $PATH timed out, trying next path..."
           done
