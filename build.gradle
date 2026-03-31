@@ -20,9 +20,11 @@ java {
 dependencies {
     compileOnly 'javax:javaee-api:8.0'
 
-    implementation 'com.sun.xml.ws:jaxws-rt:2.3.7'
-    implementation 'javax.xml.ws:jaxws-api:2.3.1'
-    implementation 'javax.jws:javax.jws-api:1.1'
+    // These JAX-WS runtime libraries are provided by the Liberty runtime.
+    // Mark them compileOnly so they are available for compilation but not packaged into the WAR.
+    compileOnly 'com.sun.xml.ws:jaxws-rt:2.3.7'
+    compileOnly 'javax.xml.ws:jaxws-api:2.3.1'
+    compileOnly 'javax.jws:javax.jws-api:1.1'
 
     testImplementation 'junit:junit:4.13.2'
 }
