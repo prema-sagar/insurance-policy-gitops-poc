@@ -10,7 +10,8 @@ jobs:
     env:
       IMAGE: ${{ secrets.DOCKERHUB_USERNAME }}/insurance-health-component
       CONTAINER_NAME: insurance
-      WSDL_PATH: "/insurance/HealthPolicySoapService?wsdl"
+      # Try several likely WSDL paths if the app uses a different context root
+      WSDL_PATHS: "/insurance/HealthPolicySoapService?wsdl /insurance-health-component/HealthPolicySoapService?wsdl /insurance/HealthPolicySoapServiceImpl?wsdl /insurance-health-component/HealthPolicySoapServiceImpl?wsdl"
 
     steps:
       - name: Checkout repository
@@ -46,20 +47,37 @@ jobs:
       - name: Wait for WSDL and print first lines
         run: |
           set -o pipefail
-          echo "Waiting for WSDL at http://localhost:9080${WSDL_PATH} ..."
+          echo "Trying WSDL paths: $WSDL_PATHS"
           ATTEMPTS=0
-          until curl -sS --max-time 5 "http://localhost:9080${WSDL_PATH}" -o wsdl.xml; do
-            ATTEMPTS=$((ATTEMPTS+1))
-            if [ "$ATTEMPTS" -ge 30 ]; then
-              echo "WSDL not available after $ATTEMPTS attempts" >&2
-              docker logs $CONTAINER_NAME --tail 200 || true
-              exit 1
-            fi
-            echo "Waiting for server to start... ($ATTEMPTS)"
-            sleep 5
+          SUCCESS=0
+          for PATH in $WSDL_PATHS; do
+            echo "Checking path: $PATH"
+            ATTEMPTS=0
+            while [ $ATTEMPTS -lt 30 ]; do
+              if curl -sS --max-time 5 "http://localhost:9080${PATH}" -o wsdl.xml; then
+                echo "Successfully fetched WSDL from $PATH"
+                SUCCESS=1
+                break 2
+              fi
+              ATTEMPTS=$((ATTEMPTS+1))
+              echo "Waiting for server to start... (attempt $ATTEMPTS) for path $PATH"
+              sleep 5
+            done
+            echo "Path $PATH timed out, trying next path..."
           done
+          if [ $SUCCESS -ne 1 ]; then
+            echo "WSDL not available after trying all paths" >&2
+            docker logs $CONTAINER_NAME --tail 200 || true
+            exit 1
+          fi
           echo "WSDL fetched — first 200 chars:"
           head -c 200 wsdl.xml || true
+
+      - name: Upload WSDL artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: wsdl-xml
+          path: wsdl.xml
 
       - name: Tear down container
         if: always()
