@@ -1,11 +1,17 @@
 package com.example.insurance.model;
 
 import javax.persistence.*;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "CLAIMS")
+@XmlRootElement(name = "Claim")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class Claim implements Serializable {
 
     @Id
@@ -22,6 +28,7 @@ public class Claim implements Serializable {
     private double amount;
 
     @Column(name = "CREATED_ON")
+    @XmlJavaTypeAdapter(com.example.insurance.model.LocalDateTimeAdapter.class)
     private LocalDateTime createdOn;
 
     public Claim() {
