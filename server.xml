@@ -20,9 +20,7 @@ httpsPort="9443" />
 <library id="H2Lib">
     <file name="/opt/ibm/wlp/usr/shared/resources/h2.jar"/>
 </library>
-<!-- The WAR is deployed via the server dropins directory in the Docker image.
-	 Reference the shared H2 library so @DataSourceDefinition can use the driver. -->
-<webApplication location="insurance-health-component.war" contextRoot="/insurance">
-    <classloader commonLibraryRef="H2Lib"/>
-</webApplication>
+<!-- Make the H2 shared library available to all applications for @DataSourceDefinition -->
+<classloader commonLibraryRef="H2Lib"/>
+<!-- The WAR is deployed via the server dropins directory in the Docker image. -->
 </server>
