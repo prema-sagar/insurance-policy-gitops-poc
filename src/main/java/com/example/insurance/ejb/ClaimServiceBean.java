@@ -2,6 +2,7 @@ package com.example.insurance.ejb;
 
 import com.example.insurance.model.Claim;
 
+import javax.annotation.sql.DataSourceDefinition;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -10,6 +11,13 @@ import java.util.List;
 import java.util.UUID;
 
 @Stateless
+@DataSourceDefinition(
+        className = "org.h2.jdbcx.JdbcDataSource",
+        name = "java:app/jdbc/InsuranceDB",
+        url = "jdbc:h2:mem:insurance;DB_CLOSE_DELAY=-1",
+        user = "sa",
+        password = ""
+)
 public class ClaimServiceBean implements ClaimServiceRemote {
 
     @PersistenceContext(unitName = "insurancePU")
