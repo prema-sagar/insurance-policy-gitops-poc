@@ -1,6 +1,5 @@
 package com.example.insurance.model;
 
-import javax.persistence.*;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -8,26 +7,18 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "CLAIMS")
 @XmlRootElement(name = "Claim")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Claim implements Serializable {
 
-    @Id
-    @Column(name = "CLAIM_ID", length = 64)
     private String claimId;
 
-    @Column(name = "POLICY_NUMBER", length = 64)
     private String policyNumber;
 
-    @Column(name = "CLAIM_STATUS", length = 32)
     private String claimStatus;
 
-    @Column(name = "AMOUNT")
     private double amount;
 
-    @Column(name = "CREATED_ON")
     @XmlJavaTypeAdapter(com.example.insurance.model.LocalDateTimeAdapter.class)
     private LocalDateTime createdOn;
 

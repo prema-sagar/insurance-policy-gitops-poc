@@ -5,8 +5,8 @@
                   xmlns:ns="http://soap.insurance.example.com/">
   <soapenv:Header/>
   <soapenv:Body>
-    <ns:getPolicyDetails>
+    <ns:getPolicyStatus>
       <policyNumber>POL123</policyNumber>
-    </ns:getPolicyDetails>
+    </ns:getPolicyStatus>
   </soapenv:Body>
 </soapenv:Envelope>
