@@ -15,10 +15,14 @@
 host="*"
 httpPort="9080"
 httpsPort="9443" />
-<!-- Server-side H2 library and datasource for the demo persistence unit.
-	 This makes the DataSource available as java:app/jdbc/InsuranceDB so the
-	 application does not need an @DataSourceDefinition annotation. -->
+<!-- Server-side H2 library for the demo persistence unit.
+	 This provides the H2 driver classes for @DataSourceDefinition. -->
+<library id="H2Lib">
+    <file name="/opt/ibm/wlp/usr/shared/resources/h2.jar"/>
+</library>
 <!-- The WAR is deployed via the server dropins directory in the Docker image.
-	Do not declare a duplicate <webApplication> entry here (that would try to
-	deploy the same application twice and cause the "two applications called" error). -->
+	 Reference the shared H2 library so @DataSourceDefinition can use the driver. -->
+<webApplication location="insurance-health-component.war" contextRoot="/insurance">
+    <classloader commonLibraryRef="H2Lib"/>
+</webApplication>
 </server>
