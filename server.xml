@@ -1,14 +1,14 @@
 <server description="Insurance SOAP Liberty Server">
 <featureManager>
-<feature>servlet-4.0</feature>
-<feature>jsp-2.3</feature>
-<feature>jaxws-2.2</feature>
-	<!-- Enable JPA and JDBC support for the application's persistence and @DataSourceDefinition -->
-	<feature>jpa-2.2</feature>
-	<feature>jdbc-4.2</feature>
-<feature>ejbLite-3.2</feature>
-<feature>cdi-2.0</feature>
-<feature>localConnector-1.0</feature>
+<feature>servlet-5.0</feature>
+<feature>jsp-3.1</feature>
+<feature>jaxws-3.0</feature>
+  <!-- Enable JPA and JDBC support for the application's persistence and @DataSourceDefinition -->
+  <feature>jpa-3.0</feature>
+  <feature>jdbc-4.3</feature>
+<feature>ejbLite-4.0</feature>
+<feature>cdi-3.0</feature>
+<feature>localConnector-2.0</feature>
 </featureManager>
 <httpEndpoint id="defaultHttpEndpoint"
 host="*"
@@ -18,11 +18,7 @@ httpsPort="9443" />
 	 This makes the DataSource available as java:app/jdbc/InsuranceDB so the
 	 application does not need an @DataSourceDefinition annotation. -->
 <library id="H2Lib">
-	<file name="/opt/ibm/wlp/usr/shared/resources/h2.jar"/>
-</library>
-
-<dataSource id="InsuranceDB" jndiName="jdbc/InsuranceDB">
-	<jdbcDriver libraryRef="H2Lib"/>
+    <file name="/opt/ol/wlp/usr/shared/resources/h2.jar"/>
 	<properties url="jdbc:h2:mem:insurance;DB_CLOSE_DELAY=-1" user="sa" password=""/>
 </dataSource>
 <!-- The WAR is deployed via the server dropins directory in the Docker image.
