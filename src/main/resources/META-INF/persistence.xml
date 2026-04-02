@@ -1,19 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
+             http://xmlns.jcp.org/xml/ns/persistence/persistence_2_2.xsd"
              version="2.2">
+
     <persistence-unit name="insurancePU" transaction-type="JTA">
         <!--
-            Must match the jndiName in server.xml exactly.
-            Liberty server-level datasources are bound under jdbc/InsuranceDB,
-            NOT java:app/jdbc/InsuranceDB (which caused the NameNotFoundException).
+            Must exactly match the jndiName in server.xml.
+            Server-level datasources are bound under jdbc/InsuranceDB.
+            Using java:app/jdbc/InsuranceDB causes NameNotFoundException
+            because java:app/ is an app-scoped namespace, not the server namespace.
         -->
         <jta-data-source>jdbc/InsuranceDB</jta-data-source>
         <properties>
+            <!-- Auto-create tables on startup -->
             <property name="javax.persistence.schema-generation.database.action" value="create"/>
-            <!-- EclipseLink: allow Liberty to manage transactions -->
+            <!-- Tell EclipseLink to integrate with Liberty's JTA transaction manager -->
             <property name="eclipselink.target-server" value="WebSphere_Liberty"/>
         </properties>
     </persistence-unit>
+
 </persistence>
