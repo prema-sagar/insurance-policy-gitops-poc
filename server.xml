@@ -11,19 +11,19 @@
     httpPort="9080"
     httpsPort="9443" />
 
-  <!-- Server-side H2 library for the demo persistence unit.
-       This provides the H2 driver classes for the DataSource. -->
+  <!-- H2 in-memory database driver library -->
   <library id="H2Lib">
     <file name="/opt/ibm/wlp/usr/shared/resources/h2.jar"/>
   </library>
 
-  <dataSource id="InsuranceDB" jndiName="java:app/jdbc/InsuranceDB">
+  <!--
+    jndiName MUST be jdbc/InsuranceDB (no java:app/ prefix) for a server-level
+    dataSource. java:app/ is only valid inside an application deployment descriptor.
+  -->
+  <dataSource id="InsuranceDB" jndiName="jdbc/InsuranceDB">
     <jdbcDriver libraryRef="H2Lib"/>
-    <properties url="jdbc:h2:mem:insurance;DB_CLOSE_DELAY=-1" user="sa" password=""/>
+    <properties.h2.embedded url="jdbc:h2:mem:insurance;DB_CLOSE_DELAY=-1" user="sa" password=""/>
   </dataSource>
-
-  <!-- Make the H2 shared library available to all applications for @DataSourceDefinition -->
-  <classloader commonLibraryRef="H2Lib"/>
 
   <!-- The WAR is deployed via the server dropins directory in the Docker image. -->
 

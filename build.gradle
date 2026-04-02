@@ -17,17 +17,38 @@ java {
     }
 }
 
+configurations {
+    // Separate configuration so we can copy h2.jar to build/h2/ for Docker
+    h2Driver
+}
+
 dependencies {
     compileOnly 'javax:javaee-api:8.0'
 
-    // These JAX-WS runtime libraries are provided by the Liberty runtime.
-    // Mark them compileOnly so they are available for compilation but not packaged into the WAR.
+    // JAX-WS runtime provided by Liberty — compile only, not packaged in WAR
     compileOnly 'com.sun.xml.ws:jaxws-rt:2.3.7'
     compileOnly 'javax.xml.ws:jaxws-api:2.3.1'
     compileOnly 'javax.jws:javax.jws-api:1.1'
 
+    // H2 is provided as a Liberty shared library (server.xml <library>).
+    // It must NOT be inside the WAR — Liberty needs to load it at server level
+    // so the container-managed DataSource can see it.
+    compileOnly 'com.h2database:h2:2.1.214'
+    h2Driver   'com.h2database:h2:2.1.214'
+
     testImplementation 'junit:junit:4.13.2'
 }
+
+// Copies h2.jar to build/h2/h2.jar so the Dockerfile can COPY it into the image
+// without needing to download anything at Docker build time.
+task h2Copy(type: Copy) {
+    from configurations.h2Driver
+    into "${buildDir}/h2"
+    rename { 'h2.jar' }
+}
+
+// Make sure h2.jar is ready before building the Docker image
+war.dependsOn h2Copy
 
 war {
     archiveFileName = 'insurance-health-component.war'
