@@ -23,7 +23,8 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build WAR
-        run: gradle clean build
+        # 'war' task compiles the app and produces build/libs/insurance-health-component.war
+        run: ./gradlew clean war
 
       - name: Docker Login
         uses: docker/login-action@v3
@@ -31,8 +32,10 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build Image
+      - name: Build Docker Image
+        # Dockerfile downloads derby.jar from Maven Central during this step.
+        # No external services or docker-compose needed.
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/insurance-health-component:latest .
 
-      - name: Push Image
+      - name: Push Docker Image
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/insurance-health-component:latest

@@ -1,7 +1,9 @@
 <server description="Insurance SOAP Liberty Server">
 
   <featureManager>
+    <!-- webProfile-8.0 includes servlet, jsp, jpa-2.2, ejbLite, cdi, jndi, jdbc, jaxb -->
     <feature>webProfile-8.0</feature>
+    <!-- jaxws-2.2 is NOT part of webProfile, must be listed separately -->
     <feature>jaxws-2.2</feature>
     <feature>localConnector-1.0</feature>
   </featureManager>
@@ -9,31 +11,31 @@
   <httpEndpoint id="defaultHttpEndpoint"
     host="*"
     httpPort="9080"
-    httpsPort="9443" />
+    httpsPort="9443"/>
 
   <!--
-    H2 driver jar - copied into the image by the Dockerfile.
-    Must live at server level so the container-managed DataSource can load it.
+    Derby JDBC driver library.
+    The jar is downloaded during Docker image build (see Dockerfile).
+    ${shared.resource.dir} resolves to /opt/ibm/wlp/usr/shared/resources
   -->
-  <library id="H2Lib">
-    <file name="/opt/ibm/wlp/usr/shared/resources/h2.jar"/>
+  <library id="DerbyLib">
+    <fileset dir="${shared.resource.dir}/derby" includes="*.jar"/>
   </library>
 
   <!--
-    jndiName must be  jdbc/InsuranceDB  (no java:app/ prefix).
-    java:app/ is an application-scoped namespace; server.xml datasources
-    live in the global jdbc/ namespace and are looked up as jdbc/InsuranceDB.
+    jndiName="jdbc/InsuranceDB"  — NO java:app/ prefix.
+    Server-level datasources live in the jdbc/ namespace.
+    persistence.xml must use the same value: jdbc/InsuranceDB
 
-    Use plain <properties> (not <properties.h2.embedded>).
-    The .h2.embedded variant tells Liberty to omit the URL and use its own
-    embedded engine path, which breaks H2's mem: URL entirely.
+    databaseName="memory:insuranceDB" = fully in-memory Derby database.
+    createDatabase="create"           = auto-creates on first connect.
+    No files written to disk, perfect for containers and CI.
   -->
   <dataSource id="InsuranceDB" jndiName="jdbc/InsuranceDB">
-    <jdbcDriver libraryRef="H2Lib"/>
-    <properties
-      url="jdbc:h2:mem:insurance;DB_CLOSE_DELAY=-1"
-      user="sa"
-      password=""/>
+    <jdbcDriver libraryRef="DerbyLib"/>
+    <properties.derby.embedded
+      databaseName="memory:insuranceDB"
+      createDatabase="create"/>
   </dataSource>
 
 </server>

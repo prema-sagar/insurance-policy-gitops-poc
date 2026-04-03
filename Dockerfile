@@ -1,16 +1,21 @@
 FROM ibmcom/websphere-liberty:latest
 
-# Remove any pre-existing copy of the app to avoid
-# "It is not possible to start two applications called ..." errors on restart.
+# Remove any stale app to prevent "two applications with same name" error
 RUN rm -f /opt/ibm/wlp/usr/servers/defaultServer/dropins/insurance-health-component* || true
 
-# Copy the H2 driver into Liberty's shared resources directory.
-# server.xml references it via <library id="H2Lib"> so Liberty can create
-# the container-managed DataSource. The jar must NOT be inside the WAR.
-# build/h2/h2.jar is produced by the Gradle h2Copy task before docker build.
-COPY build/h2/h2.jar /opt/ibm/wlp/usr/shared/resources/h2.jar
+# Download Apache Derby into Liberty's shared resources directory.
+# Derby is NOT bundled in the Liberty image, so we fetch it here.
+# This runs at image build time (GitHub Actions / local docker build).
+# Using Maven Central — the same version Liberty's JPA stack is tested against.
+RUN mkdir -p /opt/ibm/wlp/usr/shared/resources/derby && \
+    curl -fsSL \
+      https://repo1.maven.org/maven2/org/apache/derby/derby/10.14.2.0/derby-10.14.2.0.jar \
+      -o /opt/ibm/wlp/usr/shared/resources/derby/derby.jar && \
+    curl -fsSL \
+      https://repo1.maven.org/maven2/org/apache/derby/derbytools/10.14.2.0/derbytools-10.14.2.0.jar \
+      -o /opt/ibm/wlp/usr/shared/resources/derby/derbytools.jar
 
-# Copy server config and application
+# Copy server config and WAR
 COPY server.xml /config/
 COPY build/libs/insurance-health-component.war /config/dropins/
 

@@ -17,44 +17,23 @@ java {
     }
 }
 
-// Separate configuration to resolve H2 jar without bundling it into the WAR.
-// The Dockerfile copies it to /opt/ibm/wlp/usr/shared/resources/h2.jar
-// and server.xml references it as a <library>, which is how Liberty provides
-// a server-level DataSource driver. If H2 is also inside the WAR (via
-// 'implementation'), the classloader sees two copies and the connection URL
-// gets corrupted — hence the "URL format error" seen in the logs.
-configurations {
-    h2Driver
-}
-
 dependencies {
     compileOnly 'javax:javaee-api:8.0'
 
-    // JAX-WS runtime is provided by Liberty — compile only, not in WAR
+    // JAX-WS runtime is provided by Liberty — compile only, NOT in the WAR
     compileOnly 'com.sun.xml.ws:jaxws-rt:2.3.7'
     compileOnly 'javax.xml.ws:jaxws-api:2.3.1'
     compileOnly 'javax.jws:javax.jws-api:1.1'
 
-    // H2 is a server-level shared library, NOT inside the WAR.
-    // compileOnly keeps it off the WAR classpath.
-    // h2Driver lets us copy the jar to build/h2/ for the Dockerfile to pick up.
-    compileOnly    'com.h2database:h2:2.1.214'
-    h2Driver       'com.h2database:h2:2.1.214'
+    // Derby is provided as a Liberty shared library loaded from the Docker image.
+    // compileOnly keeps it off the WAR classpath entirely.
+    // The actual jar is downloaded by the Dockerfile at image build time.
+    compileOnly 'org.apache.derby:derby:10.14.2.0'
 
     testImplementation 'junit:junit:4.13.2'
 }
 
-// Copies h2-2.1.214.jar → build/h2/h2.jar so the Dockerfile can
-// COPY it into the image without any network call at Docker build time.
-tasks.register('h2Copy', Copy) {
-    from configurations.h2Driver
-    into "${layout.buildDirectory.get()}/h2"
-    rename { 'h2.jar' }
-}
-
-// Ensure h2.jar is ready before the WAR (and therefore before Docker build)
-tasks.named('war') {
-    dependsOn 'h2Copy'
+war {
     archiveFileName = 'insurance-health-component.war'
 }
 

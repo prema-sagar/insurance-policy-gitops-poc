@@ -7,17 +7,18 @@
 
     <persistence-unit name="insurancePU" transaction-type="JTA">
         <!--
-            Must exactly match the jndiName in server.xml.
-            Server-level datasources are bound under jdbc/InsuranceDB.
-            Using java:app/jdbc/InsuranceDB causes NameNotFoundException
-            because java:app/ is an app-scoped namespace, not the server namespace.
+            MUST match jndiName in server.xml exactly.
+            jdbc/InsuranceDB  (no java:app/ prefix — that caused NameNotFoundException before)
         -->
         <jta-data-source>jdbc/InsuranceDB</jta-data-source>
+
         <properties>
-            <!-- Auto-create tables on startup -->
+            <!-- Auto-create tables from JPA @Entity classes on first boot -->
             <property name="javax.persistence.schema-generation.database.action" value="create"/>
-            <!-- Tell EclipseLink to integrate with Liberty's JTA transaction manager -->
+            <!-- EclipseLink must integrate with Liberty's JTA transaction manager -->
             <property name="eclipselink.target-server" value="WebSphere_Liberty"/>
+            <!-- Tell EclipseLink we are talking to Derby -->
+            <property name="eclipselink.target-database" value="Derby"/>
         </properties>
     </persistence-unit>
 
