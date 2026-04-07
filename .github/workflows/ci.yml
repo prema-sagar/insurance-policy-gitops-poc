@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build, Scan and Push Docker Image
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  build:
+  build-scan-push:
     runs-on: ubuntu-latest
 
     steps:
@@ -19,17 +19,16 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      # Installs Gradle 7.6 and puts 'gradle' on the PATH.
-      # The repo has no gradlew wrapper script/jar, so we use the installed
-      # gradle binary directly for the build step.
       - name: Set up Gradle 7.6
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '7.6'
 
       - name: Build WAR
-        # Use 'gradle' (the installed binary), NOT './gradlew' (missing from repo)
         run: gradle clean war
+
+      - name: Run Unit Tests
+        run: gradle test
 
       - name: Docker Login
         uses: docker/login-action@v3
@@ -38,7 +37,23 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build Docker Image
-        run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/insurance-health-component:latest .
+        run: |
+          docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/insurance-health-component:${{ github.run_number }} .
+          docker tag ${{ secrets.DOCKERHUB_USERNAME }}/insurance-health-component:${{ github.run_number }} \
+            ${{ secrets.DOCKERHUB_USERNAME }}/insurance-health-component:latest
 
-      - name: Push Docker Image
+      - name: Scan Docker Image using Trivy
+        uses: aquasecurity/trivy-action@0.35.0
+        with:
+          image-ref: '${{ secrets.DOCKERHUB_USERNAME }}/insurance-health-component:${{ github.run_number }}'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Push Docker Image Version Tag
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/insurance-health-component:${{ github.run_number }}
+
+      - name: Push Docker Image Latest Tag
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/insurance-health-component:latest
