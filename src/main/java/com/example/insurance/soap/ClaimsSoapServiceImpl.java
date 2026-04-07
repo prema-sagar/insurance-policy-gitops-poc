@@ -1,6 +1,6 @@
 package com.example.insurance.soap;
 
-import com.example.insurance.ejb.ClaimServiceRemote;
+import com.example.insurance.ejb.ClaimServiceLocal;
 import com.example.insurance.model.Claim;
 
 import javax.ejb.EJB;
@@ -16,7 +16,7 @@ import java.util.List;
 public class ClaimsSoapServiceImpl implements ClaimsSoapService {
 
     @EJB
-    private ClaimServiceRemote claimService;
+    private ClaimServiceLocal claimService;
 
     @Override
     public Claim createClaim(String policyNumber, double amount) {
