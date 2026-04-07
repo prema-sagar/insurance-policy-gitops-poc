@@ -1,15 +1,16 @@
-package com.insurance.soap.service;
+package com.example.insurance.soap;
 
 import javax.jws.WebService;
 
 @WebService(
-    endpointInterface = "com.insurance.soap.service.HealthPolicySoapService",
+    endpointInterface = "com.example.insurance.soap.HealthPolicySoapService",
     serviceName = "HealthPolicySoapService"
 )
 public class HealthPolicySoapServiceImpl implements HealthPolicySoapService {
 
     @Override
     public PolicyDetailsResponse getPolicyDetails(String policyNumber) {
+
         PolicyDetailsResponse response = new PolicyDetailsResponse();
 
         if ("POL1001".equalsIgnoreCase(policyNumber)) {
@@ -34,11 +35,9 @@ public class HealthPolicySoapServiceImpl implements HealthPolicySoapService {
 
         if ("POL1001".equalsIgnoreCase(policyNumber)) {
             return "ACTIVE";
-        } 
-        else if ("POL1002".equalsIgnoreCase(policyNumber)) {
+        } else if ("POL1002".equalsIgnoreCase(policyNumber)) {
             return "EXPIRED";
-        } 
-        else if ("POL1003".equalsIgnoreCase(policyNumber)) {
+        } else if ("POL1003".equalsIgnoreCase(policyNumber)) {
             return "PENDING";
         }
 

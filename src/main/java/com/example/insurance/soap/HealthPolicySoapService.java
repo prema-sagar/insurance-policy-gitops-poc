@@ -1,4 +1,4 @@
-package com.insurance.soap.service;
+package com.example.insurance.soap;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
