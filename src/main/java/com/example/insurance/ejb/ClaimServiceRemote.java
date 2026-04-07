@@ -1,12 +1,20 @@
 package com.example.insurance.ejb;
 
 import com.example.insurance.model.Claim;
-import java.util.List;
-import javax.ejb.Local;
 
-@Local
+import javax.ejb.Remote;
+import java.util.List;
+
+@Remote
 public interface ClaimServiceRemote {
+
     Claim createClaim(String policyNumber, double amount);
-    Claim getClaim(String claimId);
-    List<Claim> listClaimsForPolicy(String policyNumber);
+
+    Claim getClaimById(String claimId);
+
+    List<Claim> getAllClaims();
+
+    Claim updateClaimStatus(String claimId, String status);
+
+    boolean deleteClaim(String claimId);
 }

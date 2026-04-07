@@ -1,6 +1,7 @@
 package com.example.insurance.soap;
 
 import com.example.insurance.model.Claim;
+
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 import java.util.List;
@@ -12,8 +13,14 @@ public interface ClaimsSoapService {
     Claim createClaim(String policyNumber, double amount);
 
     @WebMethod
-    Claim getClaim(String claimId);
+    Claim getClaimById(String claimId);
 
     @WebMethod
-    List<Claim> listClaimsForPolicy(String policyNumber);
+    List<Claim> getAllClaims();
+
+    @WebMethod
+    Claim updateClaimStatus(String claimId, String status);
+
+    @WebMethod
+    boolean deleteClaim(String claimId);
 }

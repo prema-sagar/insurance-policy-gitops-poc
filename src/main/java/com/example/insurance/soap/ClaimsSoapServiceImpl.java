@@ -8,9 +8,7 @@ import javax.jws.WebService;
 import java.util.List;
 
 @WebService(
-        endpointInterface = "com.example.insurance.soap.ClaimsSoapService",
-        serviceName = "ClaimsSoapService",
-        portName = "ClaimsSoapPort"
+    endpointInterface = "com.example.insurance.soap.ClaimsSoapService"
 )
 public class ClaimsSoapServiceImpl implements ClaimsSoapService {
 
@@ -19,26 +17,26 @@ public class ClaimsSoapServiceImpl implements ClaimsSoapService {
 
     @Override
     public Claim createClaim(String policyNumber, double amount) {
-        if (claimService == null) {
-            // fallback: create simple claim instance without persistence
-            return new Claim("CLM-FALLBACK-" + System.currentTimeMillis(), policyNumber, "RECEIVED", amount);
-        }
         return claimService.createClaim(policyNumber, amount);
     }
 
     @Override
-    public Claim getClaim(String claimId) {
-        if (claimService == null) {
-            return null;
-        }
-        return claimService.getClaim(claimId);
+    public Claim getClaimById(String claimId) {
+        return claimService.getClaimById(claimId);
     }
 
     @Override
-    public List<Claim> listClaimsForPolicy(String policyNumber) {
-        if (claimService == null) {
-            return java.util.Collections.emptyList();
-        }
-        return claimService.listClaimsForPolicy(policyNumber);
+    public List<Claim> getAllClaims() {
+        return claimService.getAllClaims();
+    }
+
+    @Override
+    public Claim updateClaimStatus(String claimId, String status) {
+        return claimService.updateClaimStatus(claimId, status);
+    }
+
+    @Override
+    public boolean deleteClaim(String claimId) {
+        return claimService.deleteClaim(claimId);
     }
 }

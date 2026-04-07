@@ -1,53 +1,30 @@
 package com.example.insurance.model;
 
-import javax.persistence.*;
-import javax.xml.bind.annotation.XmlAccessType;
-import javax.xml.bind.annotation.XmlAccessorType;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.Serializable;
-import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "CLAIMS")
-@XmlRootElement(name = "Claim")
-@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement
 public class Claim implements Serializable {
 
     @Id
-    @Column(name = "CLAIM_ID", length = 64)
-    private String claimId;
+    private String id;
 
-    @Column(name = "POLICY_NUMBER", length = 64, nullable = false)
     private String policyNumber;
-
-    @Column(name = "CLAIM_STATUS", length = 32)
-    private String claimStatus;
-
-    @Column(name = "AMOUNT")
+    private String status;
     private double amount;
-
-    @Column(name = "CREATED_ON")
-    @XmlJavaTypeAdapter(com.example.insurance.model.LocalDateTimeAdapter.class)
-    private LocalDateTime createdOn;
 
     public Claim() {
     }
 
-    public Claim(String claimId, String policyNumber, String claimStatus, double amount) {
-        this.claimId = claimId;
-        this.policyNumber = policyNumber;
-        this.claimStatus = claimStatus;
-        this.amount = amount;
-        this.createdOn = LocalDateTime.now();
+    public String getId() {
+        return id;
     }
 
-    public String getClaimId() {
-        return claimId;
-    }
-
-    public void setClaimId(String claimId) {
-        this.claimId = claimId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getPolicyNumber() {
@@ -58,12 +35,12 @@ public class Claim implements Serializable {
         this.policyNumber = policyNumber;
     }
 
-    public String getClaimStatus() {
-        return claimStatus;
+    public String getStatus() {
+        return status;
     }
 
-    public void setClaimStatus(String claimStatus) {
-        this.claimStatus = claimStatus;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public double getAmount() {
@@ -72,13 +49,5 @@ public class Claim implements Serializable {
 
     public void setAmount(double amount) {
         this.amount = amount;
-    }
-
-    public LocalDateTime getCreatedOn() {
-        return createdOn;
-    }
-
-    public void setCreatedOn(LocalDateTime createdOn) {
-        this.createdOn = createdOn;
     }
 }
