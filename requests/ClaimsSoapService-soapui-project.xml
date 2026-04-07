@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project id="c3397172-3e0e-45c6-a572-d93d2e015559" activeEnvironment="Default" name="ClaimsSoapService" resourceRoot="" soapui-version="5.9.1" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:WsdlInterface" id="2abb2a79-492d-47d1-a719-063fac1aad75" wsaVersion="NONE" name="ClaimsSoapServiceSoapBinding" type="wsdl" bindingName="{http://soap.insurance.example.com/}ClaimsSoapServiceSoapBinding" soapVersion="1_1" anonymous="optional" definition="http://localhost:9080/insurance-health-component/ClaimsSoapService?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://localhost:9080/insurance-health-component/ClaimsSoapService?wsdl"><con:part><con:url>http://localhost:9080/insurance-health-component/ClaimsSoapService?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="ClaimsSoapService" targetNamespace="http://soap.insurance.example.com/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://soap.insurance.example.com/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http">
+  <wsdl:types>
+    <xs:schema elementFormDefault="unqualified" targetNamespace="http://soap.insurance.example.com/" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="claim" type="tns:claim"/>
+      <xs:element name="createClaim" type="tns:createClaim"/>
+      <xs:element name="createClaimResponse" type="tns:createClaimResponse"/>
+      <xs:element name="deleteClaim" type="tns:deleteClaim"/>
+      <xs:element name="deleteClaimResponse" type="tns:deleteClaimResponse"/>
+      <xs:element name="getAllClaims" type="tns:getAllClaims"/>
+      <xs:element name="getAllClaimsResponse" type="tns:getAllClaimsResponse"/>
+      <xs:element name="getClaimById" type="tns:getClaimById"/>
+      <xs:element name="getClaimByIdResponse" type="tns:getClaimByIdResponse"/>
+      <xs:element name="updateClaimStatus" type="tns:updateClaimStatus"/>
+      <xs:element name="updateClaimStatusResponse" type="tns:updateClaimStatusResponse"/>
+      <xs:complexType name="createClaim">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="policyNumber" type="xs:string"/>
+          <xs:element name="amount" type="xs:double"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="createClaimResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="claim" type="tns:claim"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="claim">
+        <xs:sequence>
+          <xs:element name="amount" type="xs:double"/>
+          <xs:element minOccurs="0" name="id" type="xs:string"/>
+          <xs:element minOccurs="0" name="policyNumber" type="xs:string"/>
+          <xs:element minOccurs="0" name="status" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="deleteClaim">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="claimId" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="deleteClaimResponse">
+        <xs:sequence>
+          <xs:element name="deleted" type="xs:boolean"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="getAllClaims">
+        <xs:sequence/>
+      </xs:complexType>
+      <xs:complexType name="getAllClaimsResponse">
+        <xs:sequence>
+          <xs:element maxOccurs="unbounded" minOccurs="0" name="claims" type="tns:claim"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="getClaimById">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="claimId" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="getClaimByIdResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="claim" type="tns:claim"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="updateClaimStatus">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="claimId" type="xs:string"/>
+          <xs:element minOccurs="0" name="status" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="updateClaimStatusResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="claim" type="tns:claim"/>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="getAllClaimsResponse">
+    <wsdl:part element="tns:getAllClaimsResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="createClaim">
+    <wsdl:part element="tns:createClaim" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="deleteClaim">
+    <wsdl:part element="tns:deleteClaim" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="deleteClaimResponse">
+    <wsdl:part element="tns:deleteClaimResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getClaimById">
+    <wsdl:part element="tns:getClaimById" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="updateClaimStatus">
+    <wsdl:part element="tns:updateClaimStatus" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="createClaimResponse">
+    <wsdl:part element="tns:createClaimResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="updateClaimStatusResponse">
+    <wsdl:part element="tns:updateClaimStatusResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getClaimByIdResponse">
+    <wsdl:part element="tns:getClaimByIdResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getAllClaims">
+    <wsdl:part element="tns:getAllClaims" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="ClaimsSoapService">
+    <wsdl:operation name="createClaim">
+      <wsdl:input message="tns:createClaim" name="createClaim"></wsdl:input>
+      <wsdl:output message="tns:createClaimResponse" name="createClaimResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="deleteClaim">
+      <wsdl:input message="tns:deleteClaim" name="deleteClaim"></wsdl:input>
+      <wsdl:output message="tns:deleteClaimResponse" name="deleteClaimResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getAllClaims">
+      <wsdl:input message="tns:getAllClaims" name="getAllClaims"></wsdl:input>
+      <wsdl:output message="tns:getAllClaimsResponse" name="getAllClaimsResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getClaimById">
+      <wsdl:input message="tns:getClaimById" name="getClaimById"></wsdl:input>
+      <wsdl:output message="tns:getClaimByIdResponse" name="getClaimByIdResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="updateClaimStatus">
+      <wsdl:input message="tns:updateClaimStatus" name="updateClaimStatus"></wsdl:input>
+      <wsdl:output message="tns:updateClaimStatusResponse" name="updateClaimStatusResponse"></wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="ClaimsSoapServiceSoapBinding" type="tns:ClaimsSoapService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="createClaim">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="createClaim">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="createClaimResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="deleteClaim">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="deleteClaim">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="deleteClaimResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getAllClaims">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getAllClaims">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getAllClaimsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getClaimById">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getClaimById">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getClaimByIdResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="updateClaimStatus">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="updateClaimStatus">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="updateClaimStatusResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ClaimsSoapService">
+    <wsdl:port binding="tns:ClaimsSoapServiceSoapBinding" name="ClaimsSoapServicePort">
+      <soap:address location="http://localhost:9080/insurance-health-component/ClaimsSoapService"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:9080/insurance-health-component/ClaimsSoapService</con:endpoint></con:endpoints><con:operation id="a846466c-9153-4c20-8562-9e82bea5c79a" isOneWay="false" action="" name="createClaim" bindingOperationName="createClaim" type="Request-Response" outputName="createClaimResponse" inputName="createClaim" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="5c8b80ff-dfe8-4d81-948f-d403cfb7fbe7" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:9080/insurance-health-component/ClaimsSoapService</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:ins="http://soap.insurance.example.com/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ins:createClaim>
+         <policyNumber>POL12345</policyNumber>
+         <amount>5000</amount>
+      </ins:createClaim>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://soap.insurance.example.com/ClaimsSoapService/createClaim"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="5b910c44-b777-4660-a6d2-b55ae0f38749" isOneWay="false" action="" name="deleteClaim" bindingOperationName="deleteClaim" type="Request-Response" outputName="deleteClaimResponse" inputName="deleteClaim" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="568c24f4-8544-46ca-9363-4efb15e01ca9" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:9080/insurance-health-component/ClaimsSoapService</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:ins="http://soap.insurance.example.com/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ins:deleteClaim>
+         <claimId>CLM-12345678</claimId>
+      </ins:deleteClaim>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://soap.insurance.example.com/ClaimsSoapService/deleteClaim"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="677aea61-3a96-4074-aa1b-e44565233f58" isOneWay="false" action="" name="getAllClaims" bindingOperationName="getAllClaims" type="Request-Response" outputName="getAllClaimsResponse" inputName="getAllClaims" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="c289ae01-62b3-4be5-b634-5de3bed6084d" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:9080/insurance-health-component/ClaimsSoapService</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:ins="http://soap.insurance.example.com/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ins:getAllClaims/>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://soap.insurance.example.com/ClaimsSoapService/getAllClaims"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="51878dea-ec07-454a-9eed-a6c301b4802f" isOneWay="false" action="" name="getClaimById" bindingOperationName="getClaimById" type="Request-Response" outputName="getClaimByIdResponse" inputName="getClaimById" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="ec0326d4-3f46-4f57-aa4b-53e26a91c3dd" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:9080/insurance-health-component/ClaimsSoapService</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:ins="http://soap.insurance.example.com/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ins:getClaimById>
+         <claimId>CLM-a1f4cdee</claimId>
+      </ins:getClaimById>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://soap.insurance.example.com/ClaimsSoapService/getClaimById"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="009d1cd9-e29a-4164-abca-a40fb8ae864e" isOneWay="false" action="" name="updateClaimStatus" bindingOperationName="updateClaimStatus" type="Request-Response" outputName="updateClaimStatusResponse" inputName="updateClaimStatus" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="a40afedb-6316-4ffc-9275-61b8a8beb4e8" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:9080/insurance-health-component/ClaimsSoapService</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:ins="http://soap.insurance.example.com/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ins:updateClaimStatus>
+         <claimId>CLM-a1f4cdee</claimId>
+         <status>APPROVED</status>
+      </ins:updateClaimStatus>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://soap.insurance.example.com/ClaimsSoapService/updateClaimStatus"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/></con:soapui-project>

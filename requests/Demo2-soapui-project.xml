@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project id="348bfd28-b4be-4dbc-9071-096f9c439a1f" activeEnvironment="Default" name="Demo2" resourceRoot="" soapui-version="5.9.1" abortOnError="false" runType="SEQUENTIAL" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:WsdlInterface" id="97d78135-939b-4fa6-8ee4-59243eb5b9f2" wsaVersion="NONE" name="HealthPolicySoapServiceSoapBinding" type="wsdl" bindingName="{http://soap.insurance.example.com/}HealthPolicySoapServiceSoapBinding" soapVersion="1_1" anonymous="optional" definition="http://localhost:9080/insurance-health-component/HealthPolicySoapService?wsdl" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://localhost:9080/insurance-health-component/HealthPolicySoapService?wsdl"><con:part><con:url>http://localhost:9080/insurance-health-component/HealthPolicySoapService?wsdl</con:url><con:content><![CDATA[<wsdl:definitions name="HealthPolicySoapService" targetNamespace="http://soap.insurance.example.com/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://soap.insurance.example.com/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns1="http://schemas.xmlsoap.org/soap/http">
+  <wsdl:types>
+    <xs:schema elementFormDefault="unqualified" targetNamespace="http://soap.insurance.example.com/" version="1.0" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="getPolicyDetails" type="tns:getPolicyDetails"/>
+      <xs:element name="getPolicyDetailsResponse" type="tns:getPolicyDetailsResponse"/>
+      <xs:element name="getPolicyStatus" type="tns:getPolicyStatus"/>
+      <xs:element name="getPolicyStatusResponse" type="tns:getPolicyStatusResponse"/>
+      <xs:complexType name="getPolicyDetails">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="getPolicyDetailsResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="return" type="tns:policyResponse"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="policyResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="insuredName" type="xs:string"/>
+          <xs:element minOccurs="0" name="policyNumber" type="xs:string"/>
+          <xs:element minOccurs="0" name="policyStatus" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="getPolicyStatus">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="arg0" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+      <xs:complexType name="getPolicyStatusResponse">
+        <xs:sequence>
+          <xs:element minOccurs="0" name="return" type="xs:string"/>
+        </xs:sequence>
+      </xs:complexType>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="getPolicyDetails">
+    <wsdl:part element="tns:getPolicyDetails" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getPolicyStatus">
+    <wsdl:part element="tns:getPolicyStatus" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getPolicyDetailsResponse">
+    <wsdl:part element="tns:getPolicyDetailsResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getPolicyStatusResponse">
+    <wsdl:part element="tns:getPolicyStatusResponse" name="parameters"></wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="HealthPolicySoapService">
+    <wsdl:operation name="getPolicyDetails">
+      <wsdl:input message="tns:getPolicyDetails" name="getPolicyDetails"></wsdl:input>
+      <wsdl:output message="tns:getPolicyDetailsResponse" name="getPolicyDetailsResponse"></wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getPolicyStatus">
+      <wsdl:input message="tns:getPolicyStatus" name="getPolicyStatus"></wsdl:input>
+      <wsdl:output message="tns:getPolicyStatusResponse" name="getPolicyStatusResponse"></wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="HealthPolicySoapServiceSoapBinding" type="tns:HealthPolicySoapService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="getPolicyDetails">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getPolicyDetails">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getPolicyDetailsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getPolicyStatus">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getPolicyStatus">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getPolicyStatusResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="HealthPolicySoapService">
+    <wsdl:port binding="tns:HealthPolicySoapServiceSoapBinding" name="HealthPolicySoapPort">
+      <soap:address location="http://localhost:9080/insurance-health-component/HealthPolicySoapService"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://localhost:9080/insurance-health-component/HealthPolicySoapService</con:endpoint></con:endpoints><con:operation id="487ffe99-9123-44f8-9747-678027984d3f" isOneWay="false" action="" name="getPolicyDetails" bindingOperationName="getPolicyDetails" type="Request-Response" outputName="getPolicyDetailsResponse" inputName="getPolicyDetails" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="c67ea602-f31e-4806-bdb6-fc87b9d2462d" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:9080/insurance-health-component/HealthPolicySoapService</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:ins="http://soap.insurance.example.com/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ins:getPolicyDetails>
+         <policyNumber>POL1001</policyNumber>
+      </ins:getPolicyDetails>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://soap.insurance.example.com/HealthPolicySoapService/getPolicyDetails"/><con:wsrmConfig version="1.2"/></con:call></con:operation><con:operation id="51756313-0087-4099-a1ba-d001eb73b84c" isOneWay="false" action="" name="getPolicyStatus" bindingOperationName="getPolicyStatus" type="Request-Response" outputName="getPolicyStatusResponse" inputName="getPolicyStatus" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="aad13b90-d99a-4e97-a28c-d9a24f1fa0aa" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://localhost:9080/insurance-health-component/HealthPolicySoapService</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:ins="http://soap.insurance.example.com/">
+   <soapenv:Header/>
+   <soapenv:Body>
+      <ins:getPolicyStatus>
+         <policyNumber>POL1001</policyNumber>
+      </ins:getPolicyStatus>
+   </soapenv:Body>
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="http://soap.insurance.example.com/HealthPolicySoapService/getPolicyStatus"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/><con:oAuth1ProfileContainer/></con:soapui-project>
