@@ -3,24 +3,44 @@ package com.example.insurance.soap;
 import com.example.insurance.model.Claim;
 
 import javax.jws.WebMethod;
+import javax.jws.WebParam;
+import javax.jws.WebResult;
 import javax.jws.WebService;
 import java.util.List;
 
-@WebService
+@WebService(
+    name = "ClaimsSoapService",
+    targetNamespace = "http://soap.insurance.example.com/"
+)
 public interface ClaimsSoapService {
 
-    @WebMethod
-    Claim createClaim(String policyNumber, double amount);
+    @WebMethod(operationName = "createClaim")
+    @WebResult(name = "claim")
+    Claim createClaim(
+        @WebParam(name = "policyNumber") String policyNumber,
+        @WebParam(name = "amount") double amount
+    );
 
-    @WebMethod
-    Claim getClaimById(String claimId);
+    @WebMethod(operationName = "getClaimById")
+    @WebResult(name = "claim")
+    Claim getClaimById(
+        @WebParam(name = "claimId") String claimId
+    );
 
-    @WebMethod
+    @WebMethod(operationName = "getAllClaims")
+    @WebResult(name = "claims")
     List<Claim> getAllClaims();
 
-    @WebMethod
-    Claim updateClaimStatus(String claimId, String status);
+    @WebMethod(operationName = "updateClaimStatus")
+    @WebResult(name = "claim")
+    Claim updateClaimStatus(
+        @WebParam(name = "claimId") String claimId,
+        @WebParam(name = "status") String status
+    );
 
-    @WebMethod
-    boolean deleteClaim(String claimId);
+    @WebMethod(operationName = "deleteClaim")
+    @WebResult(name = "deleted")
+    boolean deleteClaim(
+        @WebParam(name = "claimId") String claimId
+    );
 }

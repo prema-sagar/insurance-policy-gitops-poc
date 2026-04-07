@@ -8,7 +8,10 @@ import javax.jws.WebService;
 import java.util.List;
 
 @WebService(
-    endpointInterface = "com.example.insurance.soap.ClaimsSoapService"
+    serviceName = "ClaimsSoapService",
+    portName = "ClaimsSoapServicePort",
+    endpointInterface = "com.example.insurance.soap.ClaimsSoapService",
+    targetNamespace = "http://soap.insurance.example.com/"
 )
 public class ClaimsSoapServiceImpl implements ClaimsSoapService {
 
