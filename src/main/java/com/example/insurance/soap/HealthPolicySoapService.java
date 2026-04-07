@@ -1,15 +1,19 @@
-package com.example.insurance.soap;
+package com.insurance.soap.service;
 
-import com.example.insurance.model.PolicyResponse;
 import javax.jws.WebMethod;
+import javax.jws.WebParam;
 import javax.jws.WebService;
 
-@WebService
+@WebService(targetNamespace = "http://soap.insurance.example.com/")
 public interface HealthPolicySoapService {
 
     @WebMethod
-    PolicyResponse getPolicyDetails(String policyNumber);
+    PolicyDetailsResponse getPolicyDetails(
+        @WebParam(name = "policyNumber") String policyNumber
+    );
 
     @WebMethod
-    String getPolicyStatus(String policyNumber);
+    String getPolicyStatus(
+        @WebParam(name = "policyNumber") String policyNumber
+    );
 }

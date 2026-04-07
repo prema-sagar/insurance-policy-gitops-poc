@@ -1,56 +1,47 @@
-package com.example.insurance.soap;
+package com.insurance.soap.service;
 
-import javax.ejb.EJB;
 import javax.jws.WebService;
 
-import com.example.insurance.ejb.PolicyServiceRemote;
-import com.example.insurance.model.PolicyResponse;
-
 @WebService(
-    endpointInterface = "com.example.insurance.soap.HealthPolicySoapService",
-    serviceName = "HealthPolicySoapService",
-    portName = "HealthPolicySoapPort"
+    endpointInterface = "com.insurance.soap.service.HealthPolicySoapService",
+    serviceName = "HealthPolicySoapService"
 )
 public class HealthPolicySoapServiceImpl implements HealthPolicySoapService {
 
-    @EJB
-    private PolicyServiceRemote policyService;
-
     @Override
-    public PolicyResponse getPolicyDetails(String policyNumber) {
+    public PolicyDetailsResponse getPolicyDetails(String policyNumber) {
+        PolicyDetailsResponse response = new PolicyDetailsResponse();
 
-        String status;
-        if (policyService == null) {
-            // Fallback logic when EJB isn't available (e.g., local tests)
-            if (policyNumber == null || policyNumber.isBlank()) {
-                status = "INVALID_POLICY";
-            } else if (policyNumber.startsWith("POL") || policyNumber.startsWith("HLT")) {
-                status = "ACTIVE";
-            } else {
-                status = "PENDING";
-            }
+        if ("POL1001".equalsIgnoreCase(policyNumber)) {
+            response.setPolicyNumber("POL1001");
+            response.setInsuredName("Ravi Kumar");
+            response.setPolicyType("Health Insurance");
+            response.setPolicyStatus("ACTIVE");
+            response.setPremiumAmount(15000.0);
         } else {
-            status = policyService.getPolicyStatus(policyNumber);
+            response.setPolicyNumber(policyNumber);
+            response.setInsuredName("Unknown");
+            response.setPolicyType("Unknown");
+            response.setPolicyStatus("INVALID_POLICY");
+            response.setPremiumAmount(0.0);
         }
 
-        PolicyResponse resp = new PolicyResponse();
-        resp.setPolicyNumber(policyNumber);
-        resp.setPolicyStatus(status);
-        resp.setInsuredName("Unknown");
-        return resp;
+        return response;
     }
 
     @Override
     public String getPolicyStatus(String policyNumber) {
-        if (policyService == null) {
-            if (policyNumber == null || policyNumber.isBlank()) {
-                return "INVALID_POLICY";
-            }
-            if (policyNumber.startsWith("POL") || policyNumber.startsWith("HLT")) {
-                return "ACTIVE";
-            }
+
+        if ("POL1001".equalsIgnoreCase(policyNumber)) {
+            return "ACTIVE";
+        } 
+        else if ("POL1002".equalsIgnoreCase(policyNumber)) {
+            return "EXPIRED";
+        } 
+        else if ("POL1003".equalsIgnoreCase(policyNumber)) {
             return "PENDING";
         }
-        return policyService.getPolicyStatus(policyNumber);
+
+        return "INVALID_POLICY";
     }
 }
