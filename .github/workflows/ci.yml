@@ -19,12 +19,17 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Setup Gradle
+      # Installs Gradle 7.6 and puts 'gradle' on the PATH.
+      # The repo has no gradlew wrapper script/jar, so we use the installed
+      # gradle binary directly for the build step.
+      - name: Set up Gradle 7.6
         uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '7.6'
 
       - name: Build WAR
-        # 'war' task compiles the app and produces build/libs/insurance-health-component.war
-        run: ./gradlew clean war
+        # Use 'gradle' (the installed binary), NOT './gradlew' (missing from repo)
+        run: gradle clean war
 
       - name: Docker Login
         uses: docker/login-action@v3
@@ -33,8 +38,6 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build Docker Image
-        # Dockerfile downloads derby.jar from Maven Central during this step.
-        # No external services or docker-compose needed.
         run: docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/insurance-health-component:latest .
 
       - name: Push Docker Image
