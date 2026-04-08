@@ -80,8 +80,11 @@ jobs:
       - name: Checkout GitOps repo
         uses: actions/checkout@v4
         with:
-          repository: prema-sagar/insurance-gitops-repo
+          repository: prema/insurance-gitops-repo   # ✅ exact repo name
           token: ${{ secrets.GITOPS_TOKEN }}
+
+      - name: List repo files (debug)
+        run: ls -R
 
       - name: Update Deployment YAML with new image tag
         run: |
