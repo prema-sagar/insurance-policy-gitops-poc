@@ -1,0 +1,33 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v3
+
+      - name: Build Docker image
+        run: |
+          docker build -t prema064/insurance-health-component:${{ github.sha }} .
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          docker push prema064/insurance-health-component:${{ github.sha }}
+
+      - name: Checkout GitOps repo
+        uses: actions/checkout@v3
+        with:
+          repository: prema064/insurance-gitops-repo
+          token: ${{ secrets.GITOPS_TOKEN }}
+
+      - name: Update Deployment YAML
+        run: |
+          sed -i "s|image: prema064/insurance-health-component:.*|image: prema064/insurance-health-component:${{ github.sha }}|" deployment.yaml
+          git config --global user.email "ci-bot@example.com"
+          git config --global user.name "CI Bot"
+          git commit -am "Update image tag to ${{ github.sha }}"
+          git push
