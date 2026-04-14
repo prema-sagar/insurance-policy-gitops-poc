@@ -30,7 +30,14 @@ dependencies {
     // The actual jar is downloaded by the Dockerfile at image build time.
     compileOnly 'org.apache.derby:derby:10.14.2.0'
 
+    // Unit tests
     testImplementation 'junit:junit:4.13.2'
+
+    // BDD Cucumber acceptance tests
+    testImplementation 'io.cucumber:cucumber-java:7.15.0'
+    testImplementation 'io.cucumber:cucumber-junit:7.15.0'
+    testImplementation 'io.cucumber:cucumber-picocontainer:7.15.0'
+    testImplementation 'org.picocontainer:picocontainer:2.15'
 }
 
 war {
@@ -40,5 +47,41 @@ war {
 liberty {
     server {
         name = 'defaultServer'
+    }
+}
+
+// Default test task — runs unit tests only (no running app needed)
+test {
+    useJUnit {
+        exclude '**/bdd/**'
+    }
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+    }
+}
+
+// BDD acceptance tests — run against a live deployed app
+// Usage: gradle acceptanceTest -DAPP_BASE_URL=http://localhost:9080
+task acceptanceTest(type: Test) {
+    description = 'Run Cucumber BDD acceptance tests against a deployed app.'
+    group       = 'Verification'
+
+    useJUnit {
+        include '**/runner/AcceptanceTestRunner.class'
+    }
+
+    def appUrl = System.getenv('APP_BASE_URL')
+            ?: System.getProperty('APP_BASE_URL', 'http://localhost:9080')
+
+    environment 'APP_BASE_URL', appUrl
+    systemProperty 'APP_BASE_URL', appUrl
+
+    testLogging {
+        events 'passed', 'skipped', 'failed'
+        showStandardStreams = true
+    }
+
+    reports {
+        html.outputLocation = file("${buildDir}/cucumber-reports")
     }
 }
