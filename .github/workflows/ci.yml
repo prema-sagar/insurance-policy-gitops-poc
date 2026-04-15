@@ -136,7 +136,7 @@ jobs:
           for i in $(seq 1 40); do
             HTTP=$(curl -s -o /dev/null -w "%{http_code}" \
                    --connect-timeout 5 --max-time 10 \
-                   "${{ secrets.APP_BASE_URL }}/ClaimsSoapService?wsdl" || echo "000")
+                   "${{ secrets.APP_BASE_URL }}/ClaimsSoapService" || echo "000")
             echo "Attempt $i — HTTP $HTTP"
             if [ "$HTTP" = "200" ]; then
               echo "✅ App is healthy and ready."
