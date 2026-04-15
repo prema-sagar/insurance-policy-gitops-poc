@@ -17,6 +17,6 @@ COPY server.xml /config/
 COPY build/libs/insurance-health-component.war /config/apps/InsuranceApp.war
 
 # Enable deployment
-RUN configure.sh
+#RUN configure.sh
 
 EXPOSE 9080 9443
