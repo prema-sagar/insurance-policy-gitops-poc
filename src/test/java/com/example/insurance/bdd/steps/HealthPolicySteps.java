@@ -8,75 +8,74 @@ import io.cucumber.java.en.When;
 import org.junit.Assert;
 
 /**
- * Step definitions for health_policy.feature.
+ * Step definitions for health-policy.feature.
  *
- * APP_BASE_URL env var is set by CI (GitHub Actions secret) or locally.
- * Falls back to http://localhost:9080 for Liberty dev-mode.
+ * Initializes the shared SoapClient used across tests.
  */
 public class HealthPolicySteps {
 
     private SoapClient client;
-    private String     lastPolicyDetailsResponse;
-    private String     lastPolicyStatusResponse;
-    private SoapClient.HttpResponse lastHttpResponse;
+    private String lastResponse;
 
-    @Given("the insurance app is running")
-    public void theInsuranceAppIsRunning() {
-        String url = System.getenv("APP_BASE_URL");
-        if (url == null || url.isEmpty()) {
-            url = System.getProperty("APP_BASE_URL", "http://localhost:9080");
-        }
-        client = new SoapClient(url);
-        System.out.println("[BDD] APP_BASE_URL = " + url);
+    public SoapClient getClient() {
+        return client;
     }
 
-    @When("I request policy details for {string}")
-    public void iRequestPolicyDetailsFor(String policyNumber) throws Exception {
-        lastPolicyDetailsResponse = client.getPolicyDetails(policyNumber);
-        System.out.println("[BDD] getPolicyDetails(" + policyNumber + "): " + lastPolicyDetailsResponse);
+    // ── Given ─────────────────────────────────────────────────────────────────
+
+    @Given("the SOAP service is available")
+    public void theSoapServiceIsAvailable() {
+        String baseUrl = System.getenv("APP_BASE_URL");
+
+        Assert.assertNotNull("APP_BASE_URL is not set", baseUrl);
+
+        client = new SoapClient(baseUrl);
+        System.out.println("[BDD] SOAP client initialized with URL: " + baseUrl);
     }
 
-    @When("I request policy status for {string}")
-    public void iRequestPolicyStatusFor(String policyNumber) throws Exception {
-        lastPolicyStatusResponse = client.getPolicyStatus(policyNumber);
-        System.out.println("[BDD] getPolicyStatus(" + policyNumber + "): " + lastPolicyStatusResponse);
+    // ── When ──────────────────────────────────────────────────────────────────
+
+    @When("I create a health policy for {string} with coverage {double}")
+    public void iCreateAHealthPolicy(String name, Double coverage) throws Exception {
+        lastResponse = client.createPolicy(name, coverage);
+        System.out.println("[BDD] createPolicy: " + lastResponse);
     }
 
-    @When("I call the health check endpoint")
-    public void iCallTheHealthCheckEndpoint() throws Exception {
-        lastHttpResponse = client.healthCheck();
-        System.out.println("[BDD] healthCheck HTTP " + lastHttpResponse.statusCode + ": " + lastHttpResponse.body);
+    @When("I retrieve the policy by ID {string}")
+    public void iRetrieveThePolicyById(String id) throws Exception {
+        lastResponse = client.getPolicyById(id);
+        System.out.println("[BDD] getPolicyById: " + lastResponse);
     }
+
+    @When("I request all policies")
+    public void iRequestAllPolicies() throws Exception {
+        lastResponse = client.getAllPolicies();
+        System.out.println("[BDD] getAllPolicies: " + lastResponse);
+    }
+
+    @When("I delete the policy with ID {string}")
+    public void iDeleteThePolicy(String id) throws Exception {
+        lastResponse = client.deletePolicy(id);
+        System.out.println("[BDD] deletePolicy: " + lastResponse);
+    }
+
+    // ── Then / And ────────────────────────────────────────────────────────────
 
     @Then("the response contains {string}")
-    @And("the response contains {string}")
     public void theResponseContains(String expected) {
-        Assert.assertNotNull("Policy details response was null", lastPolicyDetailsResponse);
+        Assert.assertNotNull("Response was null", lastResponse);
         Assert.assertTrue(
-            "Expected [" + expected + "] in:\n" + lastPolicyDetailsResponse,
-            lastPolicyDetailsResponse.contains(expected));
+                "Expected [" + expected + "] in:\n" + lastResponse,
+                lastResponse.contains(expected)
+        );
     }
 
-    @Then("the status response is {string}")
-    public void theStatusResponseIs(String expected) {
-        Assert.assertNotNull("Policy status response was null", lastPolicyStatusResponse);
+    @And("the response is a valid SOAP response")
+    public void theResponseIsValidSOAP() {
+        Assert.assertNotNull("Response was null", lastResponse);
         Assert.assertTrue(
-            "Expected [" + expected + "] in:\n" + lastPolicyStatusResponse,
-            lastPolicyStatusResponse.contains(expected));
+                "Expected SOAP Envelope in response:\n" + lastResponse,
+                lastResponse.contains("Envelope")
+        );
     }
-
-    @Then("the HTTP status is {int}")
-    public void theHTTPStatusIs(int expectedCode) {
-        Assert.assertEquals("HTTP status mismatch", expectedCode, lastHttpResponse.statusCode);
-    }
-
-    @And("the response body contains {string}")
-    public void theResponseBodyContains(String expected) {
-        Assert.assertNotNull("HTTP body was null", lastHttpResponse.body);
-        Assert.assertTrue(
-            "Expected [" + expected + "] in body:\n" + lastHttpResponse.body,
-            lastHttpResponse.body.contains(expected));
-    }
-
-    SoapClient getClient() { return client; }
 }
