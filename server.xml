@@ -1,9 +1,7 @@
 <server description="Insurance SOAP Liberty Server">
 
   <featureManager>
-    <!-- webProfile-8.0 includes servlet, jsp, jpa-2.2, ejbLite, cdi, jndi, jdbc, jaxb -->
     <feature>webProfile-8.0</feature>
-    <!-- jaxws-2.2 is NOT part of webProfile, must be listed separately -->
     <feature>jaxws-2.2</feature>
     <feature>localConnector-1.0</feature>
   </featureManager>
@@ -13,24 +11,13 @@
     httpPort="9080"
     httpsPort="9443"/>
 
-  <!--
-    Derby JDBC driver library.
-    The jar is downloaded during Docker image build (see Dockerfile).
-    ${shared.resource.dir} resolves to /opt/ibm/wlp/usr/shared/resources
-  -->
+  <!-- ✅ ADD THIS -->
+  <application location="InsuranceApp.war" contextRoot="/InsuranceApp"/>
+
   <library id="DerbyLib">
     <fileset dir="${shared.resource.dir}/derby" includes="*.jar"/>
   </library>
 
-  <!--
-    jndiName="jdbc/InsuranceDB"  — NO java:app/ prefix.
-    Server-level datasources live in the jdbc/ namespace.
-    persistence.xml must use the same value: jdbc/InsuranceDB
-
-    databaseName="memory:insuranceDB" = fully in-memory Derby database.
-    createDatabase="create"           = auto-creates on first connect.
-    No files written to disk, perfect for containers and CI.
-  -->
   <dataSource id="InsuranceDB" jndiName="jdbc/InsuranceDB">
     <jdbcDriver libraryRef="DerbyLib"/>
     <properties.derby.embedded

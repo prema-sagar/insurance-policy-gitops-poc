@@ -13,10 +13,7 @@ RUN mkdir -p /opt/ibm/wlp/usr/shared/resources/derby && \
 # Copy config
 COPY server.xml /config/
 
-# ✅ IMPORTANT FIX
-COPY build/libs/insurance-health-component.war /config/apps/InsuranceApp.war
-
-# Enable deployment
-#RUN configure.sh
+# ✅ Copy WAR (this is enough)
+COPY build/libs/*.war /config/apps/InsuranceApp.war
 
 EXPOSE 9080 9443
