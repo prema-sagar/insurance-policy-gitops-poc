@@ -36,7 +36,7 @@ public class ClaimsSteps {
     @Given("a claim has been created for policy {string} with amount {double}")
     public void aClaimHasBeenCreatedForPolicyWithAmount(String policy, Double amount) throws Exception {
         lastClaimResponse = client().createClaim(policy, amount);
-        currentClaimId    = extractXmlValue(lastClaimResponse, "id");
+        currentClaimId = extractXmlValue(lastClaimResponse, "id");
         System.out.println("[BDD] pre-created claim id=" + currentClaimId);
     }
 
@@ -45,7 +45,7 @@ public class ClaimsSteps {
     @When("I create a claim for policy {string} with amount {double}")
     public void iCreateAClaimForPolicyWithAmount(String policy, Double amount) throws Exception {
         lastClaimResponse = client().createClaim(policy, amount);
-        currentClaimId    = extractXmlValue(lastClaimResponse, "id");
+        currentClaimId = extractXmlValue(lastClaimResponse, "id");
         System.out.println("[BDD] createClaim: " + lastClaimResponse);
     }
 
@@ -78,13 +78,13 @@ public class ClaimsSteps {
 
     // ── Then / And ────────────────────────────────────────────────────────────
 
+    // ✅ FIX: Only ONE annotation (removed duplicate @And)
     @Then("the claim response contains {string}")
-    @And("the claim response contains {string}")
     public void theClaimResponseContains(String expected) {
         Assert.assertNotNull("Claim response was null", lastClaimResponse);
         Assert.assertTrue(
-            "Expected [" + expected + "] in:\n" + lastClaimResponse,
-            lastClaimResponse.contains(expected));
+                "Expected [" + expected + "] in:\n" + lastClaimResponse,
+                lastClaimResponse.contains(expected));
     }
 
     @And("a claim ID is returned")
@@ -97,16 +97,16 @@ public class ClaimsSteps {
     public void theAllClaimsResponseIsAValidSOAPResponse() {
         Assert.assertNotNull("getAllClaims response was null", lastClaimResponse);
         Assert.assertTrue(
-            "Expected SOAP Envelope in response:\n" + lastClaimResponse,
-            lastClaimResponse.contains("Envelope"));
+                "Expected SOAP Envelope in response:\n" + lastClaimResponse,
+                lastClaimResponse.contains("Envelope"));
     }
 
     @Then("the delete response contains {string}")
     public void theDeleteResponseContains(String expected) {
         Assert.assertNotNull("Delete response was null", lastClaimResponse);
         Assert.assertTrue(
-            "Expected [" + expected + "] in:\n" + lastClaimResponse,
-            lastClaimResponse.contains(expected));
+                "Expected [" + expected + "] in:\n" + lastClaimResponse,
+                lastClaimResponse.contains(expected));
     }
 
     // ── Helper ────────────────────────────────────────────────────────────────
