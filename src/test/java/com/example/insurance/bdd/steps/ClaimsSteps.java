@@ -1,181 +1,43 @@
-package com.example.insurance.bdd;
+package com.example.insurance.bdd.steps;
 
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import com.example.insurance.bdd.SoapClient;
+import io.cucumber.java.en.*;
+import org.junit.Assert;
 
-public class SoapClient {
+import java.util.regex.*;
 
-    private final String baseUrl;
+public class ClaimsSteps {
 
-    // ✅ Updated constructor
-    public SoapClient(String baseUrl, String contextPath) {
-        // remove trailing slash if any
-        if (baseUrl.endsWith("/")) {
-            baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
-        }
+    private final HealthPolicySteps healthSteps;
+    private String lastResponse;
+    private String claimId;
 
-        this.baseUrl = baseUrl + "/" + contextPath;
+    public ClaimsSteps(HealthPolicySteps healthSteps) {
+        this.healthSteps = healthSteps;
     }
 
-    // ---------------- CLAIMS ----------------
-
-    public String createClaim(String policy, Double amount) throws Exception {
-        String soapBody =
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
-                "<soapenv:Body>" +
-                "<createClaim>" +
-                "<policyNumber>" + policy + "</policyNumber>" +
-                "<amount>" + amount + "</amount>" +
-                "</createClaim>" +
-                "</soapenv:Body>" +
-                "</soapenv:Envelope>";
-
-        return callSoapService("/ClaimsSoapService", soapBody);
+    private SoapClient client() {
+        return healthSteps.getClient();
     }
 
-    public String getClaimById(String id) throws Exception {
-        String soapBody =
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
-                "<soapenv:Body>" +
-                "<getClaimById>" +
-                "<id>" + id + "</id>" +
-                "</getClaimById>" +
-                "</soapenv:Body>" +
-                "</soapenv:Envelope>";
-
-        return callSoapService("/ClaimsSoapService", soapBody);
+    @When("I create a claim for policy {string} with amount {double}")
+    public void createClaim(String policy, Double amount) throws Exception {
+        lastResponse = client().createClaim(policy, amount);
+        claimId = extract(lastResponse, "id");
     }
 
-    public String getAllClaims() throws Exception {
-        String soapBody =
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
-                "<soapenv:Body>" +
-                "<getAllClaims/>" +
-                "</soapenv:Body>" +
-                "</soapenv:Envelope>";
-
-        return callSoapService("/ClaimsSoapService", soapBody);
+    @Then("the claim response contains {string}")
+    public void validate(String expected) {
+        Assert.assertTrue(lastResponse.contains(expected));
     }
 
-    public String updateClaimStatus(String id, String status) throws Exception {
-        String soapBody =
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
-                "<soapenv:Body>" +
-                "<updateClaimStatus>" +
-                "<id>" + id + "</id>" +
-                "<status>" + status + "</status>" +
-                "</updateClaimStatus>" +
-                "</soapenv:Body>" +
-                "</soapenv:Envelope>";
-
-        return callSoapService("/ClaimsSoapService", soapBody);
+    @Then("a claim ID is returned")
+    public void checkId() {
+        Assert.assertNotNull(claimId);
     }
 
-    public String deleteClaim(String id) throws Exception {
-        String soapBody =
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
-                "<soapenv:Body>" +
-                "<deleteClaim>" +
-                "<id>" + id + "</id>" +
-                "</deleteClaim>" +
-                "</soapenv:Body>" +
-                "</soapenv:Envelope>";
-
-        return callSoapService("/ClaimsSoapService", soapBody);
-    }
-
-    // ---------------- POLICY ----------------
-
-    public String getPolicyDetails(String policyNumber) throws Exception {
-        String soapBody =
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
-                "<soapenv:Body>" +
-                "<getPolicyDetails>" +
-                "<policyNumber>" + policyNumber + "</policyNumber>" +
-                "</getPolicyDetails>" +
-                "</soapenv:Body>" +
-                "</soapenv:Envelope>";
-
-        return callSoapService("/HealthPolicySoapService", soapBody);
-    }
-
-    public String getPolicyStatus(String policyNumber) throws Exception {
-        String soapBody =
-                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
-                "<soapenv:Body>" +
-                "<getPolicyStatus>" +
-                "<policyNumber>" + policyNumber + "</policyNumber>" +
-                "</getPolicyStatus>" +
-                "</soapenv:Body>" +
-                "</soapenv:Envelope>";
-
-        return callSoapService("/HealthPolicySoapService", soapBody);
-    }
-
-    // ---------------- HEALTH ----------------
-
-    public HttpResponse healthCheck() throws Exception {
-        URL url = new URL(baseUrl + "/health");
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-
-        int status = conn.getResponseCode();
-        String body = readStream(
-                status >= 200 && status < 300
-                        ? conn.getInputStream()
-                        : conn.getErrorStream()
-        );
-
-        return new HttpResponse(status, body);
-    }
-
-    // ---------------- CORE METHOD ----------------
-
-    private String callSoapService(String path, String body) throws Exception {
-        URL url = new URL(baseUrl + path);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Content-Type", "text/xml;charset=UTF-8");
-        conn.setDoOutput(true);
-
-        try (OutputStream os = conn.getOutputStream()) {
-            os.write(body.getBytes());
-        }
-
-        int status = conn.getResponseCode();
-
-        InputStream stream = (status >= 200 && status < 300)
-                ? conn.getInputStream()
-                : conn.getErrorStream();
-
-        return readStream(stream);
-    }
-
-    private String readStream(InputStream is) throws Exception {
-        if (is == null) return null;
-
-        BufferedReader br = new BufferedReader(new InputStreamReader(is));
-        StringBuilder response = new StringBuilder();
-        String line;
-
-        while ((line = br.readLine()) != null) {
-            response.append(line);
-        }
-
-        return response.toString();
-    }
-
-    // ---------------- RESPONSE CLASS ----------------
-
-    public static class HttpResponse {
-        public int statusCode;
-        public String body;
-
-        public HttpResponse(int statusCode, String body) {
-            this.statusCode = statusCode;
-            this.body = body;
-        }
+    private String extract(String xml, String tag) {
+        Matcher m = Pattern.compile("<" + tag + ">(.*?)</").matcher(xml);
+        return m.find() ? m.group(1) : null;
     }
 }
