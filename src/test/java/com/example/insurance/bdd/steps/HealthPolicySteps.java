@@ -13,12 +13,22 @@ public class HealthPolicySteps {
 
     @Given("the insurance app is running")
     public void theInsuranceAppIsRunning() {
-        String url = System.getenv("APP_BASE_URL");
-        if (url == null || url.isEmpty()) {
-            url = System.getProperty("APP_BASE_URL", "http://localhost:9080");
+
+        String baseUrl = System.getenv("APP_BASE_URL");
+        if (baseUrl == null || baseUrl.isEmpty()) {
+            baseUrl = System.getProperty("APP_BASE_URL", "http://localhost:9080");
         }
-        client = new SoapClient(url);
-        System.out.println("[BDD] APP_BASE_URL = " + url);
+
+        // ✅ NEW: context path (important fix)
+        String contextPath = System.getenv("APP_CONTEXT");
+        if (contextPath == null || contextPath.isEmpty()) {
+            contextPath = "insurance-health-component";
+        }
+
+        client = new SoapClient(baseUrl, contextPath);
+
+        System.out.println("[BDD] BASE_URL = " + baseUrl);
+        System.out.println("[BDD] CONTEXT_PATH = " + contextPath);
     }
 
     @When("I request policy details for {string}")
@@ -41,34 +51,27 @@ public class HealthPolicySteps {
 
     @Then("the response contains {string}")
     public void theResponseContains(String expected) {
-        Assert.assertNotNull("Policy details response was null", lastPolicyDetailsResponse);
-        Assert.assertTrue(
-            "Expected [" + expected + "] in:\n" + lastPolicyDetailsResponse,
-            lastPolicyDetailsResponse.contains(expected));
+        Assert.assertNotNull(lastPolicyDetailsResponse);
+        Assert.assertTrue(lastPolicyDetailsResponse.contains(expected));
     }
 
     @Then("the status response is {string}")
     public void theStatusResponseIs(String expected) {
-        Assert.assertNotNull("Policy status response was null", lastPolicyStatusResponse);
-        Assert.assertTrue(
-            "Expected [" + expected + "] in:\n" + lastPolicyStatusResponse,
-            lastPolicyStatusResponse.contains(expected));
+        Assert.assertNotNull(lastPolicyStatusResponse);
+        Assert.assertTrue(lastPolicyStatusResponse.contains(expected));
     }
 
     @Then("the HTTP status is {int}")
     public void theHTTPStatusIs(int expectedCode) {
-        Assert.assertEquals("HTTP status mismatch", expectedCode, lastHttpResponse.statusCode);
+        Assert.assertEquals(expectedCode, lastHttpResponse.statusCode);
     }
 
     @Then("the response body contains {string}")
     public void theResponseBodyContains(String expected) {
-        Assert.assertNotNull("HTTP body was null", lastHttpResponse.body);
-        Assert.assertTrue(
-            "Expected [" + expected + "] in body:\n" + lastHttpResponse.body,
-            lastHttpResponse.body.contains(expected));
+        Assert.assertNotNull(lastHttpResponse.body);
+        Assert.assertTrue(lastHttpResponse.body.contains(expected));
     }
 
-    // Package-visible — used by ClaimsSteps via PicoContainer injection
     SoapClient getClient() {
         return client;
     }

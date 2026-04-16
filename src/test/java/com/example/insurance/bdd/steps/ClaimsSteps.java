@@ -9,8 +9,6 @@ import java.util.regex.Pattern;
 
 public class ClaimsSteps {
 
-    // PicoContainer injects HealthPolicySteps — gives us the SoapClient
-    // that was already initialised by the Background step "the insurance app is running"
     private final HealthPolicySteps healthSteps;
 
     private String lastClaimResponse;
@@ -24,16 +22,12 @@ public class ClaimsSteps {
         return healthSteps.getClient();
     }
 
-    // ── GIVEN ────────────────────────────────────────────────────────────────
-
     @Given("a claim has been created for policy {string} with amount {double}")
     public void aClaimHasBeenCreated(String policy, Double amount) throws Exception {
         lastClaimResponse = client().createClaim(policy, amount);
         currentClaimId = extractXmlValue(lastClaimResponse, "id");
         System.out.println("[BDD] pre-created claim id=" + currentClaimId);
     }
-
-    // ── WHEN ─────────────────────────────────────────────────────────────────
 
     @When("I create a claim for policy {string} with amount {double}")
     public void createClaim(String policy, Double amount) throws Exception {
@@ -69,39 +63,29 @@ public class ClaimsSteps {
         System.out.println("[BDD] deleteClaim: " + lastClaimResponse);
     }
 
-    // ── THEN ─────────────────────────────────────────────────────────────────
-
     @Then("the claim response contains {string}")
     public void validateResponse(String expected) {
-        Assert.assertNotNull("Claim response was null", lastClaimResponse);
-        Assert.assertTrue(
-            "Expected [" + expected + "] in:\n" + lastClaimResponse,
-            lastClaimResponse.contains(expected));
+        Assert.assertNotNull(lastClaimResponse);
+        Assert.assertTrue(lastClaimResponse.contains(expected));
     }
 
     @Then("a claim ID is returned")
     public void validateClaimId() {
-        Assert.assertNotNull("claimId was null in response:\n" + lastClaimResponse, currentClaimId);
-        Assert.assertFalse("claimId was empty", currentClaimId.trim().isEmpty());
+        Assert.assertNotNull(currentClaimId);
+        Assert.assertFalse(currentClaimId.trim().isEmpty());
     }
 
     @Then("the all-claims response is a valid SOAP response")
     public void validateAllClaimsResponse() {
-        Assert.assertNotNull("getAllClaims response was null", lastClaimResponse);
-        Assert.assertTrue(
-            "Expected SOAP Envelope in:\n" + lastClaimResponse,
-            lastClaimResponse.contains("Envelope"));
+        Assert.assertNotNull(lastClaimResponse);
+        Assert.assertTrue(lastClaimResponse.contains("Envelope"));
     }
 
     @Then("the delete response contains {string}")
     public void validateDeleteResponse(String expected) {
-        Assert.assertNotNull("Delete response was null", lastClaimResponse);
-        Assert.assertTrue(
-            "Expected [" + expected + "] in:\n" + lastClaimResponse,
-            lastClaimResponse.contains(expected));
+        Assert.assertNotNull(lastClaimResponse);
+        Assert.assertTrue(lastClaimResponse.contains(expected));
     }
-
-    // ── HELPER ───────────────────────────────────────────────────────────────
 
     private String extractXmlValue(String xml, String tag) {
         if (xml == null) return null;
