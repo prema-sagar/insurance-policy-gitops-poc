@@ -8,82 +8,75 @@ public class SoapClient {
 
     private final String baseUrl;
 
-    public SoapClient(String baseUrl, String contextPath) {
+    public SoapClient(String baseUrl) {
         if (baseUrl.endsWith("/")) {
             baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
         }
-        this.baseUrl = baseUrl + "/" + contextPath;
+        this.baseUrl = baseUrl;
     }
 
     // ---------------- CLAIMS ----------------
 
     public String createClaim(String policy, Double amount) throws Exception {
-        String body = envelope(
+        return call("/ClaimsSoapService", envelope(
                 "<ins:createClaim>" +
                         "<policyNumber>" + policy + "</policyNumber>" +
                         "<amount>" + amount + "</amount>" +
                         "</ins:createClaim>"
-        );
-        return call("/ClaimsSoapService", body);
+        ));
     }
 
     public String getClaimById(String id) throws Exception {
-        String body = envelope(
+        return call("/ClaimsSoapService", envelope(
                 "<ins:getClaimById>" +
-                        "<claimId>" + id + "</claimId>" +   // ✅ FIXED
+                        "<claimId>" + id + "</claimId>" +
                         "</ins:getClaimById>"
-        );
-        return call("/ClaimsSoapService", body);
+        ));
     }
 
     public String getAllClaims() throws Exception {
-        String body = envelope("<ins:getAllClaims/>");
-        return call("/ClaimsSoapService", body);
+        return call("/ClaimsSoapService", envelope("<ins:getAllClaims/>"));
     }
 
     public String updateClaimStatus(String id, String status) throws Exception {
-        String body = envelope(
+        return call("/ClaimsSoapService", envelope(
                 "<ins:updateClaimStatus>" +
-                        "<claimId>" + id + "</claimId>" +   // ✅ FIXED
+                        "<claimId>" + id + "</claimId>" +
                         "<status>" + status + "</status>" +
                         "</ins:updateClaimStatus>"
-        );
-        return call("/ClaimsSoapService", body);
+        ));
     }
 
     public String deleteClaim(String id) throws Exception {
-        String body = envelope(
+        return call("/ClaimsSoapService", envelope(
                 "<ins:deleteClaim>" +
-                        "<claimId>" + id + "</claimId>" +   // ✅ FIXED
+                        "<claimId>" + id + "</claimId>" +
                         "</ins:deleteClaim>"
-        );
-        return call("/ClaimsSoapService", body);
+        ));
     }
 
     // ---------------- POLICY ----------------
 
     public String getPolicyDetails(String policyNumber) throws Exception {
-        String body = envelope(
+        return call("/HealthPolicySoapService", envelope(
                 "<ins:getPolicyDetails>" +
                         "<policyNumber>" + policyNumber + "</policyNumber>" +
                         "</ins:getPolicyDetails>"
-        );
-        return call("/HealthPolicySoapService", body);
+        ));
     }
 
     public String getPolicyStatus(String policyNumber) throws Exception {
-        String body = envelope(
+        return call("/HealthPolicySoapService", envelope(
                 "<ins:getPolicyStatus>" +
                         "<policyNumber>" + policyNumber + "</policyNumber>" +
                         "</ins:getPolicyStatus>"
-        );
-        return call("/HealthPolicySoapService", body);
+        ));
     }
 
     // ---------------- HEALTH ----------------
 
     public HttpResponse healthCheck() throws Exception {
-        URL url = new URL(baseUrl + "/healthCheck"); // adjust if needed
+        URL url = new URL(baseUrl + "/healthCheck"); // try /actuator/health if needed
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
 
@@ -106,7 +99,7 @@ public class SoapClient {
     }
 
     private String call(String path, String body) throws Exception {
-        URL url = new URL(baseUrl + path);
+        URL url = new URL(baseUrl + path);  // 🔥 KEY FIX HERE
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
         conn.setRequestMethod("POST");
@@ -142,8 +135,6 @@ public class SoapClient {
 
         return sb.toString();
     }
-
-    // ---------------- RESPONSE CLASS ----------------
 
     public static class HttpResponse {
         public int statusCode;
