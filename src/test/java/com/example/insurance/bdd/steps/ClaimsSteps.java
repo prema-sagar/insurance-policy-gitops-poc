@@ -1,95 +1,181 @@
-package com.example.insurance.bdd.steps;
+package com.example.insurance.bdd;
 
-import com.example.insurance.bdd.SoapClient;
-import io.cucumber.java.en.*;
-import org.junit.Assert;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+public class SoapClient {
 
-public class ClaimsSteps {
+    private final String baseUrl;
 
-    private final HealthPolicySteps healthSteps;
+    // ✅ Updated constructor
+    public SoapClient(String baseUrl, String contextPath) {
+        // remove trailing slash if any
+        if (baseUrl.endsWith("/")) {
+            baseUrl = baseUrl.substring(0, baseUrl.length() - 1);
+        }
 
-    private String lastClaimResponse;
-    private String currentClaimId;
-
-    public ClaimsSteps(HealthPolicySteps healthSteps) {
-        this.healthSteps = healthSteps;
+        this.baseUrl = baseUrl + "/" + contextPath;
     }
 
-    private SoapClient client() {
-        return healthSteps.getClient();
+    // ---------------- CLAIMS ----------------
+
+    public String createClaim(String policy, Double amount) throws Exception {
+        String soapBody =
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
+                "<soapenv:Body>" +
+                "<createClaim>" +
+                "<policyNumber>" + policy + "</policyNumber>" +
+                "<amount>" + amount + "</amount>" +
+                "</createClaim>" +
+                "</soapenv:Body>" +
+                "</soapenv:Envelope>";
+
+        return callSoapService("/ClaimsSoapService", soapBody);
     }
 
-    @Given("a claim has been created for policy {string} with amount {double}")
-    public void aClaimHasBeenCreated(String policy, Double amount) throws Exception {
-        lastClaimResponse = client().createClaim(policy, amount);
-        currentClaimId = extractXmlValue(lastClaimResponse, "id");
-        System.out.println("[BDD] pre-created claim id=" + currentClaimId);
+    public String getClaimById(String id) throws Exception {
+        String soapBody =
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
+                "<soapenv:Body>" +
+                "<getClaimById>" +
+                "<id>" + id + "</id>" +
+                "</getClaimById>" +
+                "</soapenv:Body>" +
+                "</soapenv:Envelope>";
+
+        return callSoapService("/ClaimsSoapService", soapBody);
     }
 
-    @When("I create a claim for policy {string} with amount {double}")
-    public void createClaim(String policy, Double amount) throws Exception {
-        lastClaimResponse = client().createClaim(policy, amount);
-        currentClaimId = extractXmlValue(lastClaimResponse, "id");
-        System.out.println("[BDD] createClaim: " + lastClaimResponse);
+    public String getAllClaims() throws Exception {
+        String soapBody =
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
+                "<soapenv:Body>" +
+                "<getAllClaims/>" +
+                "</soapenv:Body>" +
+                "</soapenv:Envelope>";
+
+        return callSoapService("/ClaimsSoapService", soapBody);
     }
 
-    @When("I retrieve the claim by its ID")
-    public void getClaim() throws Exception {
-        Assert.assertNotNull("No claim ID from previous step", currentClaimId);
-        lastClaimResponse = client().getClaimById(currentClaimId);
-        System.out.println("[BDD] getClaimById: " + lastClaimResponse);
+    public String updateClaimStatus(String id, String status) throws Exception {
+        String soapBody =
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
+                "<soapenv:Body>" +
+                "<updateClaimStatus>" +
+                "<id>" + id + "</id>" +
+                "<status>" + status + "</status>" +
+                "</updateClaimStatus>" +
+                "</soapenv:Body>" +
+                "</soapenv:Envelope>";
+
+        return callSoapService("/ClaimsSoapService", soapBody);
     }
 
-    @When("I request all claims")
-    public void getAllClaims() throws Exception {
-        lastClaimResponse = client().getAllClaims();
-        System.out.println("[BDD] getAllClaims: " + lastClaimResponse);
+    public String deleteClaim(String id) throws Exception {
+        String soapBody =
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
+                "<soapenv:Body>" +
+                "<deleteClaim>" +
+                "<id>" + id + "</id>" +
+                "</deleteClaim>" +
+                "</soapenv:Body>" +
+                "</soapenv:Envelope>";
+
+        return callSoapService("/ClaimsSoapService", soapBody);
     }
 
-    @When("I update the claim status to {string}")
-    public void updateClaim(String status) throws Exception {
-        Assert.assertNotNull("No claim ID from previous step", currentClaimId);
-        lastClaimResponse = client().updateClaimStatus(currentClaimId, status);
-        System.out.println("[BDD] updateClaimStatus: " + lastClaimResponse);
+    // ---------------- POLICY ----------------
+
+    public String getPolicyDetails(String policyNumber) throws Exception {
+        String soapBody =
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
+                "<soapenv:Body>" +
+                "<getPolicyDetails>" +
+                "<policyNumber>" + policyNumber + "</policyNumber>" +
+                "</getPolicyDetails>" +
+                "</soapenv:Body>" +
+                "</soapenv:Envelope>";
+
+        return callSoapService("/HealthPolicySoapService", soapBody);
     }
 
-    @When("I delete the claim")
-    public void deleteClaim() throws Exception {
-        Assert.assertNotNull("No claim ID from previous step", currentClaimId);
-        lastClaimResponse = client().deleteClaim(currentClaimId);
-        System.out.println("[BDD] deleteClaim: " + lastClaimResponse);
+    public String getPolicyStatus(String policyNumber) throws Exception {
+        String soapBody =
+                "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\">" +
+                "<soapenv:Body>" +
+                "<getPolicyStatus>" +
+                "<policyNumber>" + policyNumber + "</policyNumber>" +
+                "</getPolicyStatus>" +
+                "</soapenv:Body>" +
+                "</soapenv:Envelope>";
+
+        return callSoapService("/HealthPolicySoapService", soapBody);
     }
 
-    @Then("the claim response contains {string}")
-    public void validateResponse(String expected) {
-        Assert.assertNotNull(lastClaimResponse);
-        Assert.assertTrue(lastClaimResponse.contains(expected));
+    // ---------------- HEALTH ----------------
+
+    public HttpResponse healthCheck() throws Exception {
+        URL url = new URL(baseUrl + "/health");
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
+
+        int status = conn.getResponseCode();
+        String body = readStream(
+                status >= 200 && status < 300
+                        ? conn.getInputStream()
+                        : conn.getErrorStream()
+        );
+
+        return new HttpResponse(status, body);
     }
 
-    @Then("a claim ID is returned")
-    public void validateClaimId() {
-        Assert.assertNotNull(currentClaimId);
-        Assert.assertFalse(currentClaimId.trim().isEmpty());
+    // ---------------- CORE METHOD ----------------
+
+    private String callSoapService(String path, String body) throws Exception {
+        URL url = new URL(baseUrl + path);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Content-Type", "text/xml;charset=UTF-8");
+        conn.setDoOutput(true);
+
+        try (OutputStream os = conn.getOutputStream()) {
+            os.write(body.getBytes());
+        }
+
+        int status = conn.getResponseCode();
+
+        InputStream stream = (status >= 200 && status < 300)
+                ? conn.getInputStream()
+                : conn.getErrorStream();
+
+        return readStream(stream);
     }
 
-    @Then("the all-claims response is a valid SOAP response")
-    public void validateAllClaimsResponse() {
-        Assert.assertNotNull(lastClaimResponse);
-        Assert.assertTrue(lastClaimResponse.contains("Envelope"));
+    private String readStream(InputStream is) throws Exception {
+        if (is == null) return null;
+
+        BufferedReader br = new BufferedReader(new InputStreamReader(is));
+        StringBuilder response = new StringBuilder();
+        String line;
+
+        while ((line = br.readLine()) != null) {
+            response.append(line);
+        }
+
+        return response.toString();
     }
 
-    @Then("the delete response contains {string}")
-    public void validateDeleteResponse(String expected) {
-        Assert.assertNotNull(lastClaimResponse);
-        Assert.assertTrue(lastClaimResponse.contains(expected));
-    }
+    // ---------------- RESPONSE CLASS ----------------
 
-    private String extractXmlValue(String xml, String tag) {
-        if (xml == null) return null;
-        Matcher m = Pattern.compile("<(?:[^:>]+:)?" + tag + ">([^<]+)<").matcher(xml);
-        return m.find() ? m.group(1).trim() : null;
+    public static class HttpResponse {
+        public int statusCode;
+        public String body;
+
+        public HttpResponse(int statusCode, String body) {
+            this.statusCode = statusCode;
+            this.body = body;
+        }
     }
 }
