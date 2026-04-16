@@ -1,21 +1,21 @@
-package com.example.insurance.bdd.utils;
+package com.example.insurance.bdd;
 
-import java.io.*;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Scanner;
 
 public class SoapClient {
 
     private final String baseUrl;
-    private int statusCode;
 
     public SoapClient(String baseUrl) {
         this.baseUrl = baseUrl;
     }
 
-    public String callSoapService(String endpoint, String requestBody) {
+    public String call(String servicePath, String xmlRequest) {
         try {
-            String fullUrl = baseUrl + endpoint;
+            String fullUrl = baseUrl + "/" + servicePath;
 
             System.out.println("[SOAP URL] " + fullUrl);
 
@@ -27,37 +27,27 @@ public class SoapClient {
             conn.setDoOutput(true);
 
             OutputStream os = conn.getOutputStream();
-            os.write(requestBody.getBytes());
+            os.write(xmlRequest.getBytes());
             os.flush();
 
-            statusCode = conn.getResponseCode();
+            Scanner scanner;
 
-            BufferedReader br;
-            if (statusCode >= 200 && statusCode < 300) {
-                br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            if (conn.getResponseCode() >= 200 && conn.getResponseCode() < 300) {
+                scanner = new Scanner(conn.getInputStream());
             } else {
-                br = new BufferedReader(new InputStreamReader(conn.getErrorStream()));
+                scanner = new Scanner(conn.getErrorStream());
             }
 
-            StringBuilder response = new StringBuilder();
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                response.append(line);
-            }
-
-            br.close();
+            String response = scanner.useDelimiter("\\A").next();
+            scanner.close();
 
             System.out.println("[SOAP RESPONSE] " + response);
 
-            return response.toString();
+            return response;
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            return "ERROR: " + e.getMessage();
         }
-    }
-
-    public int getStatusCode() {
-        return statusCode;
     }
 }
