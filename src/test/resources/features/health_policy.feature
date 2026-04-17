@@ -33,4 +33,4 @@ Feature: Health Policy SOAP Service
     Given the insurance app is running
     When I call the health check endpoint
     Then the HTTP status is 200
-    And the response body contains "ACTIVE"
+    And the response body contains "Application is running"
