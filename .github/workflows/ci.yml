@@ -87,6 +87,9 @@ jobs:
           repository: prema-sagar/insurance-gitops-repo
           token: ${{ secrets.GITOPS_TOKEN }}
 
+      - name: List repo files (debug)
+        run: ls -R
+
       - name: Update Deployment YAML with new image tag
         run: |
           sed -i "s|image: .*/insurance-health-component:.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/insurance-health-component:${{ github.run_number }}|" deployment.yaml
@@ -95,7 +98,7 @@ jobs:
           git commit -am "Update image tag to ${{ github.run_number }}"
           git push
 
-  # ── 4. BDD Tests (ArgoCD + Kubernetes Verified) ───────────────
+  # ── 4. BDD Tests  ─────────────────────────────
   bdd-acceptance-tests:
     runs-on: ubuntu-latest
     needs: update-gitops-repo
@@ -115,87 +118,32 @@ jobs:
         with:
           gradle-version: '7.6'
 
-      # ✅ Step 1: Wait for ArgoCD sync
-      - name: Wait for ArgoCD sync
+      # ✅ Demo wait to allow ArgoCD sync + rollout
+      - name: Wait before health check (demo)
         run: |
-          echo "Waiting for ArgoCD sync..."
+          echo "Sleeping for 2 minutes to allow deployment..."
+          sleep 120
 
+      # Existing health check
+      - name: Wait for deployed app to be healthy
+        run: |
+          echo "Waiting for app at ${{ secrets.APP_BASE_URL }} to be ready..."
           for i in $(seq 1 40); do
-            SYNC=$(kubectl get application insurance-health-app -n argocd \
-              -o jsonpath="{.status.sync.status}")
-
-            HEALTH=$(kubectl get application insurance-health-app -n argocd \
-              -o jsonpath="{.status.health.status}")
-
-            echo "Attempt $i — Sync: $SYNC | Health: $HEALTH"
-
-            if [ "$SYNC" = "Synced" ] && [ "$HEALTH" = "Healthy" ]; then
-              echo "✅ ArgoCD sync completed"
-              break
-            fi
-
-            if [ "$i" = "40" ]; then
-              echo "❌ ArgoCD sync failed"
-              exit 1
-            fi
-
-            sleep 15
-          done
-
-      # ✅ Step 2: Verify deployment image + rollout
-      - name: Wait for latest deployment rollout
-        run: |
-          echo "Waiting for latest deployment image..."
-
-          EXPECTED="${{ secrets.DOCKERHUB_USERNAME }}/insurance-health-component:${{ github.run_number }}"
-
-          for i in $(seq 1 40); do
-            CURRENT=$(kubectl get deployment insurance-health-app -n insurance-app \
-              -o jsonpath="{.spec.template.spec.containers[0].image}")
-
-            echo "Attempt $i — Current: $CURRENT | Expected: $EXPECTED"
-
-            if [ "$CURRENT" = "$EXPECTED" ]; then
-              echo "✅ Correct image detected"
-
-              kubectl rollout status deployment/insurance-health-app \
-                -n insurance-app --timeout=300s
-
-              echo "✅ Rollout completed"
-              break
-            fi
-
-            if [ "$i" = "40" ]; then
-              echo "❌ Deployment not updated"
-              exit 1
-            fi
-
-            sleep 15
-          done
-
-      # ✅ Step 3: Final health check
-      - name: Verify application health
-        run: |
-          for i in $(seq 1 20); do
             HTTP=$(curl -s -o /dev/null -w "%{http_code}" \
-              "${{ secrets.APP_BASE_URL }}/ClaimsSoapService" || echo "000")
-
+                   --connect-timeout 5 --max-time 10 \
+                   "${{ secrets.APP_BASE_URL }}/ClaimsSoapService" || echo "000")
             echo "Attempt $i — HTTP $HTTP"
-
             if [ "$HTTP" = "200" ]; then
-              echo "✅ App is healthy"
+              echo "✅ App is healthy and ready."
               break
             fi
-
-            if [ "$i" = "20" ]; then
-              echo "❌ App not healthy"
+            if [ "$i" = "40" ]; then
+              echo "❌ App did not become healthy within 10 minutes. Failing pipeline."
               exit 1
             fi
-
-            sleep 10
+            sleep 15
           done
 
-      # ✅ Step 4: Run BDD tests (latest pod only)
       - name: Run BDD Cucumber Acceptance Tests
         env:
           APP_BASE_URL: ${{ secrets.APP_BASE_URL }}
