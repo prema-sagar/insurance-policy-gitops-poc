@@ -7,7 +7,7 @@ on:
 
 jobs:
 
-  # ── 1. Build WAR ─────────────────────────────────────────────────────────────
+  # ── 1. Build WAR ─────────────────────────────────────────────
   build-war:
     runs-on: ubuntu-latest
     steps:
@@ -34,7 +34,7 @@ jobs:
           name: app-war
           path: build/libs/*.war
 
-  # ── 2. Docker build + Trivy scan + push ──────────────────────────────────────
+  # ── 2. Docker build + Trivy scan + push ──────────────────────
   build-scan-push:
     runs-on: ubuntu-latest
     needs: build-war
@@ -76,7 +76,7 @@ jobs:
       - name: Push Latest Tag
         run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/insurance-health-component:latest
 
-  # ── 3. Update GitOps repo → ArgoCD auto-syncs ────────────────────────────────
+  # ── 3. Update GitOps repo ────────────────────────────────────
   update-gitops-repo:
     runs-on: ubuntu-latest
     needs: build-scan-push
@@ -87,9 +87,6 @@ jobs:
           repository: prema-sagar/insurance-gitops-repo
           token: ${{ secrets.GITOPS_TOKEN }}
 
-      - name: List repo files (debug)
-        run: ls -R
-
       - name: Update Deployment YAML with new image tag
         run: |
           sed -i "s|image: .*/insurance-health-component:.*|image: ${{ secrets.DOCKERHUB_USERNAME }}/insurance-health-component:${{ github.run_number }}|" deployment.yaml
@@ -98,15 +95,7 @@ jobs:
           git commit -am "Update image tag to ${{ github.run_number }}"
           git push
 
-  # ── 4. BDD Cucumber tests — waits for app to be live, then tests ──────────────
-  #
-  # No kubectl or ArgoCD needed here.
-  # ArgoCD syncs the cluster in the background after Job 3 pushes the git change.
-  # We simply poll the health endpoint until the new pod is up and responding,
-  # then fire the Cucumber tests against the live app.
-  #
-  # Only secret needed: APP_BASE_URL (e.g. http://<node-ip>:30080)
-  #
+  # ── 4. BDD Tests (ArgoCD + Kubernetes Verified) ───────────────
   bdd-acceptance-tests:
     runs-on: ubuntu-latest
     needs: update-gitops-repo
@@ -126,30 +115,87 @@ jobs:
         with:
           gradle-version: '7.6'
 
-      # Poll /InsuranceApp/health until 200.
-      # ArgoCD sync + Kubernetes rolling update happens in the background.
-      # Liberty takes ~30-60s to start inside the new pod.
-      # 40 attempts x 15s = 10 minutes max wait.
-      - name: Wait for deployed app to be healthy
+      # ✅ Step 1: Wait for ArgoCD sync
+      - name: Wait for ArgoCD sync
         run: |
-          echo "Waiting for app at ${{ secrets.APP_BASE_URL }} to be ready..."
+          echo "Waiting for ArgoCD sync..."
+
           for i in $(seq 1 40); do
-            HTTP=$(curl -s -o /dev/null -w "%{http_code}" \
-                   --connect-timeout 5 --max-time 10 \
-                   "${{ secrets.APP_BASE_URL }}/ClaimsSoapService" || echo "000")
-            echo "Attempt $i — HTTP $HTTP"
-            if [ "$HTTP" = "200" ]; then
-              echo "✅ App is healthy and ready."
+            SYNC=$(kubectl get application insurance-health-app -n argocd \
+              -o jsonpath="{.status.sync.status}")
+
+            HEALTH=$(kubectl get application insurance-health-app -n argocd \
+              -o jsonpath="{.status.health.status}")
+
+            echo "Attempt $i — Sync: $SYNC | Health: $HEALTH"
+
+            if [ "$SYNC" = "Synced" ] && [ "$HEALTH" = "Healthy" ]; then
+              echo "✅ ArgoCD sync completed"
               break
             fi
+
             if [ "$i" = "40" ]; then
-              echo "❌ App did not become healthy within 10 minutes. Failing pipeline."
+              echo "❌ ArgoCD sync failed"
               exit 1
             fi
+
             sleep 15
           done
 
-      # Run all Cucumber BDD scenarios against the live deployed app
+      # ✅ Step 2: Verify deployment image + rollout
+      - name: Wait for latest deployment rollout
+        run: |
+          echo "Waiting for latest deployment image..."
+
+          EXPECTED="${{ secrets.DOCKERHUB_USERNAME }}/insurance-health-component:${{ github.run_number }}"
+
+          for i in $(seq 1 40); do
+            CURRENT=$(kubectl get deployment insurance-health-app -n insurance-app \
+              -o jsonpath="{.spec.template.spec.containers[0].image}")
+
+            echo "Attempt $i — Current: $CURRENT | Expected: $EXPECTED"
+
+            if [ "$CURRENT" = "$EXPECTED" ]; then
+              echo "✅ Correct image detected"
+
+              kubectl rollout status deployment/insurance-health-app \
+                -n insurance-app --timeout=300s
+
+              echo "✅ Rollout completed"
+              break
+            fi
+
+            if [ "$i" = "40" ]; then
+              echo "❌ Deployment not updated"
+              exit 1
+            fi
+
+            sleep 15
+          done
+
+      # ✅ Step 3: Final health check
+      - name: Verify application health
+        run: |
+          for i in $(seq 1 20); do
+            HTTP=$(curl -s -o /dev/null -w "%{http_code}" \
+              "${{ secrets.APP_BASE_URL }}/ClaimsSoapService" || echo "000")
+
+            echo "Attempt $i — HTTP $HTTP"
+
+            if [ "$HTTP" = "200" ]; then
+              echo "✅ App is healthy"
+              break
+            fi
+
+            if [ "$i" = "20" ]; then
+              echo "❌ App not healthy"
+              exit 1
+            fi
+
+            sleep 10
+          done
+
+      # ✅ Step 4: Run BDD tests (latest pod only)
       - name: Run BDD Cucumber Acceptance Tests
         env:
           APP_BASE_URL: ${{ secrets.APP_BASE_URL }}
